@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,12 +15,21 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: #0f0f1a;
       color: #ffffff;
+
+      
+      background: 
+        linear-gradient(rgba(15, 10, 35, 0.55), rgba(15, 10, 35, 0.65)),
+        url("{% static 'images/background.webp' %}");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
 
     .navbar {
-      background-color: #141428;
+      background-color: rgba(20, 20, 40, 0.85);
+      backdrop-filter: blur(6px);
     }
 
     .navbar-brand {
@@ -28,36 +38,31 @@
     }
 
     .hero {
-      background: linear-gradient(135deg, #1f1f3a, #3b2f80);
-      padding: 100px 0;
+      padding: 120px 0 80px 0;
       text-align: center;
     }
 
     .hero h1 {
       font-size: 3rem;
       font-weight: 700;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.7);
     }
 
     .hero p {
-      color: #d1d1ff;
+      color: #e0e0ff;
       max-width: 650px;
       margin: auto;
-    }
-
-    .hero-img {
-      max-width: 100%;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-      margin-top: 40px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
     }
 
     .feature-card {
-      background: #1a1a2e;
+      background: rgba(26, 26, 46, 0.85);
       border: none;
       border-radius: 15px;
       padding: 30px;
       text-align: center;
       height: 100%;
+      backdrop-filter: blur(6px);
       transition: transform 0.3s;
     }
 
@@ -66,18 +71,20 @@
     }
 
     .cta-section {
-      background: #1a1a2e;
+      background: rgba(26, 26, 46, 0.9);
       padding: 60px 20px;
       border-radius: 20px;
       text-align: center;
+      backdrop-filter: blur(6px);
     }
 
     footer {
-      background: #1a1a2e;
+      background: rgba(26, 26, 46, 0.9);
       color: #aaa;
       padding: 30px 0;
       text-align: center;
       margin-top: 50px;
+      backdrop-filter: blur(6px);
     }
   </style>
 </head>
@@ -110,10 +117,6 @@
       Find your next favorite experience beyond the mainstream.
     </p>
     <a href="#" class="btn btn-lg btn-light mt-3">Browse Recommendations</a>
-
-    <img src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?q=80&w=1600&auto=format&fit=crop"
-         alt="Indie gaming aesthetic"
-         class="hero-img">
   </div>
 </section>
 
