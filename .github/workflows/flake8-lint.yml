@@ -10,7 +10,7 @@ jobs:
         python-version: 3.7.4
         architecture: x64
     - name: Run Flake8
-      uses: CS4300-CS5300-SP26/flake8-github-actions@releases/v1
+      uses: CS4300-CS5300-SP26/dev3_cust2@releases/sprint0-3
       with:
         checkName: 'lint'
       env:
