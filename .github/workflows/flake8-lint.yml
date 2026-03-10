@@ -1,0 +1,17 @@
+on: push
+name: Push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7.4
+        architecture: x64
+    - name: Run Flake8
+      uses: CS4300-CS5300-SP26/flake8-github-actions@releases/v1
+      with:
+        checkName: 'lint'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
