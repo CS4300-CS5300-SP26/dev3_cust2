@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Game | Hidden Gems</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        nav {
+            background-color: #111827;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav .nav-buttons a {
+            padding: 8px 20px;
+            border: 1px solid white;
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            margin-left: 10px;
+            font-size: 0.9rem;
+        }
+
+        nav .nav-buttons a:hover {
+            background-color: white;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+
+        .form-card {
+            background-color: #111827;
+            border-radius: 12px;
+            padding: 40px;
+        }
+
+        .field-group {
+            margin-bottom: 24px;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #d1d5db;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .checkbox-group label {
+            font-size: 0.95rem;
+            color: #d1d5db;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #6366f1;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: #4f46e5;
+        }
+
+        /* Force dark styling on all form inputs */
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            background-color: #1f2937 !important;
+            border: 1px solid #374151 !important;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #e0e0e0 !important;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #6366f1 !important;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">Hidden Gems</a>
+        <div class="nav-buttons">
+            <a href="#">Login</a>
+            <a href="#">Sign Up</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Upload Your Game</h1>
+        <p class="subtitle">Share your game with the Hidden Gems community</p>
+
+        <div class="form-card">
+            <!-- enctype required for file uploads -->
+            <form method="post" enctype="multipart/form-data">
+
+                <!-- Django CSRF security token -->
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="id_title">Game Title</label>
+                    {{ form.title }}
+                </div>
+
+                <div class="field-group">
+                    <label for="id_description">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="field-group">
+                    <label for="id_price">Price ($)</label>
+                    {{ form.price }}
+                </div>
+
+                <div class="field-group">
+                    <label for="id_genre">Genre</label>
+                    {{ form.genre }}
+                </div>
+
+                <div class="field-group">
+                    <label for="id_other_platforms">Other Platforms</label>
+                    {{ form.other_platforms }}
+                </div>
+
+                <div class="checkbox-group">
+                    {{ form.playable_in_browser }}
+                    <label for="id_playable_in_browser">Playable in browser</label>
+                </div>
+
+                <div class="field-group">
+                    <label for="id_thumbnail">Thumbnail Image</label>
+                    {{ form.thumbnail }}
+                </div>
+
+                <div class="field-group">
+                    <label for="id_build_file">Game Build File (ZIP)</label>
+                    {{ form.build_file }}
+                </div>
+
+                <button type="submit" class="submit-btn">Upload Game</button>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
