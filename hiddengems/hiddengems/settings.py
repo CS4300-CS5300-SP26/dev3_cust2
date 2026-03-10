@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'accounts',  # add this
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,5 @@ MEDIA_URL = "/media/"
 
 # Folder where uploaded files will be stored
 MEDIA_ROOT = BASE_DIR / "media"
+
+LOGIN_URL = '/'
