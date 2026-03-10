@@ -6,8 +6,10 @@ def index(request):
     return render(request, 'index.html')
 
 
-def game_detail(request, game_id):
-    game = get_object_or_404(Game, id=game_id)
+
+def game_detail(request, slug):
+    game = get_object_or_404(Game, slug=slug)
+
     return render(request, "game_detail.html", {
         "title": game.title,
         "description": game.description,
