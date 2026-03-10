@@ -1,4 +1,5 @@
 def main():
-    print("SPAM!")
+    for i in range(5):
+        print("SPAM!")
 
 main()
