@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - '*.py'
+      - '*.yml'
+
+permissions: write-all
       
 jobs:
   flake8_py3:
