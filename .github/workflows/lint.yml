@@ -1,4 +1,4 @@
-name: Flake8-Lint
+name: Lint
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - '*.py'
       
 jobs:
-  lint:
+  flake8_py3:
     runs-on: ubuntu-latest
     steps:
     - name: Setup Python
@@ -14,9 +14,13 @@ jobs:
       with:
         python-version: 3.14.3
         architecture: x64
+    - name: Checkout PyTorch
+      uses: actions/checkout@master
     - name: Install flake8
       run: pip install flake8
     - name: Run Flake8
-      run: flake8 .
+      uses: suo/flake8-github-action@releases/v1
+      with:
+        checkName: 'flake8_py3'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
