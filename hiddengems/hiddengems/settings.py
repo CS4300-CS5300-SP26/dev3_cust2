@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ri1#r_5g0&u!-$bbsl=0sx+#n^=z!t542jpu434=-rt_t$0y=@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['app-jroyer-21.devedu.io']
 
 
 # Application definition
