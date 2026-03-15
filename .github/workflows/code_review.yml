@@ -44,5 +44,34 @@ job:
           pip install openai
           pip install -r requirements.txt
       
-      # Run a diff on the PR and origin
+      # Run a diff on the PR and main
+      - name: Get PR Diff
+        run: |
+          git fetch main
+          git diff origin/${{ github.event.pull_request.base.ref }} > diff.txt
       
+      # Run the AI Code Review script using OpenAI
+      - name: Run AI Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python openai-code-review.py
+      
+      # Uploads the review artifact to be attached to pull request
+      - name: Upload Review Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: review-artifacts
+          path: feedback.md
+      
+      # Comments the feedback artifact on the pull request
+      - name: Comment feedback.md
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: feedback.md
+
+      # Runs cleanup on created files
+      - name: Cleanup Temp Files
+        run: rm diff.txt feedback.md
+
+
