@@ -68,10 +68,8 @@ try:
         model="gpt-5.1-codex-mini"
     )
 
-    feedback_message = openai_chat.choices[0].message.content
-
-
-""" Except block for when OpenAI has hit its Rate Limit """
+    feedback_message = openai_chat.choices[0].message.user_content
+    
 except openai.RateLimitError:
     print("ChatGPT Quota Exceeded")
     feedback_message = """
