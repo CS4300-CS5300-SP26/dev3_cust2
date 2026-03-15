@@ -47,7 +47,7 @@ jobs:
       # Run a diff on the PR and main
       - name: Get PR Diff
         run: |
-          git fetch main
+          git fetch
           git diff origin/${{ github.event.pull_request.base.ref }} > diff.txt
       
       # Run the AI Code Review script using OpenAI
