@@ -11,7 +11,7 @@ name: OpenAI Code Review
 #   - synchronize: when a pull request is updated
 #     to account for previous merges
 on:
-  pull-request:
+  pull_request:
     types: [opened, reopened, synchronize]
 
 # Only allows the supplied token permission to read
@@ -20,7 +20,7 @@ permissions:
   contents: read
   pull-requests: write
 
-job:
+jobs:
   ai_review:
     runs-on: ubuntu-latest
     steps:
