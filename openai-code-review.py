@@ -69,7 +69,7 @@ try:
     )
 
     feedback_message = openai_chat.choices[0].message.user_content
-    
+
 except openai.RateLimitError:
     print("ChatGPT Quota Exceeded")
     feedback_message = """
@@ -82,7 +82,7 @@ except openai.RateLimitError:
 if feedback_message.startswith("```markdown"):
     feedback_message = feedback_message[len("```markdown"):]
 elif feedback_message.startswith(FENCE):
-    feedback_message = feedback_message(len(FENCE):)
+    feedback_message = feedback_message[len(FENCE):]
 
 
 """ Remove trailing code fence if present """
