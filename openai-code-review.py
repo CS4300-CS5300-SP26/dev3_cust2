@@ -62,7 +62,7 @@ user_content = f"""
 try:
     openai_chat = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": system_content}
+            {"role": "system", "content": system_content},
             {"role": "user", "content": user_content}
         ],
         model="gpt-5.1-codex-mini"
