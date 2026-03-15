@@ -42,7 +42,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install openai
-          pip install -r requirements.txt
+      #   pip install -r requirements.txt   # commented out until created
       
       # Run a diff on the PR and main
       - name: Get PR Diff
