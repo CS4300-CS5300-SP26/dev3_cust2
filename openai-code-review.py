@@ -60,8 +60,8 @@ user_content = f"""
 
 """ Attempt to query a response from ChatGPT """
 try:
-    openai_chat = client.chat.completions.create(
-        messages=[
+    openai_chat = client.responses.create(
+        input=[
             {"role": "system", "content": system_content},
             {"role": "user", "content": user_content}
         ],
