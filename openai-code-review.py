@@ -13,10 +13,12 @@
 import openai
 from openai import OpenAI
 import os
+import requests
 
 
-""" Code Fence constant """
+""" Constants declared for efficiency """
 FENCE = "```"
+MAX_DIFF = 15000
 
 
 """ Read the diff """
@@ -26,16 +28,16 @@ with open("diff.txt", "r") as file:
     diff = file.read()
 
 
-""" Query ChatGPT """
+""" Truncate the diff to 15 KB """
+diff = diff.truncate(MAX_DIFF)
+
+
+""" Query ChatGPT for a client """
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-try:
-    client.models.list()
-except openai.AuthenticationError:
-    raise RuntimeError('OpenAI API Key invalid')
 
 
-""" Initialize System and User request messages """
-system_content = """
+""" Initialize the Instruction and Input request messages """
+instructions_content = """
     You are an industry expert in Advanced Software Engineering teaching a
     class to future software engineers in a University. You are preparing
     a code review for a select group of students on their Django project.
@@ -48,7 +50,7 @@ system_content = """
     of a team containing these students.
     """
 
-user_content = f"""
+input_content = f"""
     Provide concise, actionable feedback in Markdown format
     (do not create a file), with specific attention to pre-established
     Django convention, security, and code efficency.
@@ -68,21 +70,56 @@ user_content = f"""
 """ Attempt to query a response from ChatGPT """
 try:
     openai_chat = client.responses.create(
-        input=[
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": user_content}
-        ],
         model="gpt-5.1-codex-mini"
+        instructions=instructions_content,
+        input=input_content
     )
-
+    print(openai_chat.output_text)
     feedback_message = openai_chat.output_text
 
-except openai.RateLimitError:
-    print("ChatGPT Quota Exceeded")
-    feedback_message = """
-        **ChatGPT Quota Exceeded**
-        No OpenAI Code Review available at this time
-        """
+    
+    """ Pulls the rate limits of the response using curl """
+    url = f'https://api.openai.com/responses/{openai_chat.id}'
+    auth = "Authorization: Bearer $OPENAI_API_KEY"
+    response = requests.get(url, headers=auth)
+    print("Response Rate Limits:")
+    for header_name, header_value in response.headers.items():
+        print(f"* {header_name}: {header_value}")
+
+except openai.APITimeoutError as e:
+    print(f"""OpenAI API request took too long to complete:
+        {e}""")
+    feedback_message = (
+        f"""Open AI API request took too long to complete:
+        {e}""")
+
+except openai.AuthenticationError as e:
+    print(f"""OpenAI API request failed to authenticate the API Key:
+        {e}""")
+    feedback_message = (
+        f"""Open AI API request failed to authenticate the API Key:
+        {e}""")
+
+except openai.BadRequestError as e:
+    print(f"""OpenAI API request was malformed or is missing parameters:
+        {e}""")
+    feedback_message = (
+        f"""Open AI API request was malformed or is missing parameters:
+        {e}""")
+
+except openai.InternalServerError as e:
+    print(f"""OpenAI API request reached an Internal Server Error:
+        {e}""")
+    feedback_message = (
+        f"""Open AI API request reached an Internal Server Error:
+        {e}""")
+
+except openai.RateLimitError as e:
+    print(f"""OpenAI API request has exceeded the Rate Limit:
+        {e}""")
+    feedback_message = (
+        f"""Open AI API request has exceeded the Rate Limit:
+        {e}""")
 
 
 """ Remove any leading file details if present using list slicing """
@@ -99,8 +136,7 @@ if feedback_message.endswith(FENCE):
 
 
 """ Writes feedback to markdown file """
-code_review = f"""
-    ## OpenAI Code Review
+code_review = f"""## OpenAI Code Review
     {feedback_message}
     """
 with open("feedback.md", "w") as file:

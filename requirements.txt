@@ -1,2 +1,2 @@
-openai
-flake8
+openai==2.28.0
+flake8==7.3.0
