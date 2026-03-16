@@ -24,13 +24,19 @@ MAX_DIFF = 15000
 """ Read the diff """
 if not os.path.exists("diff.txt"):
     raise RuntimeError('Failed to find diff file')
-with open("diff.txt", "r+") as file:
-    file.truncate(MAX_DIFF)
-    diff = file.read()
+with open("diff.txt", "r") as file:
+    diff = file.read()[:MAX_DIFF]
+
+
+""" Assign the OpenAI API key to a variable """
+openai_key = os.getenv("OPENAI_API_KEY")
+if not openai_key:
+    raise RuntimeError(
+        "No API key found. Set the OPENAI_API_KEY environment variable.")
 
 
 """ Query ChatGPT for a client """
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=openai_key)
 
 
 """ Initialize the Instruction and Input request messages """
@@ -65,6 +71,7 @@ input_content = f"""
 
 
 """ Attempt to query a response from ChatGPT """
+feedback_message = ""
 try:
     openai_chat = client.responses.create(
         model="gpt-5.1-codex-mini",
@@ -77,7 +84,7 @@ try:
     
     """ Pulls the rate limits of the response using curl """
     url = f'https://api.openai.com/responses/{openai_chat.id}'
-    auth = "Authorization: Bearer $OPENAI_API_KEY"
+    auth = f"Authorization: Bearer {openai_key}"
     response = requests.get(url, headers=auth)
     print("Response Rate Limits:")
     for header_name, header_value in response.headers.items():
