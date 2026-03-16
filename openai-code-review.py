@@ -78,17 +78,11 @@ try:
         instructions=instructions_content,
         input=input_content
     )
-    print(openai_chat.output_text)
     feedback_message = openai_chat.output_text
 
-    
-    """ Pulls the rate limits of the response using curl """
-    url = f'https://api.openai.com/responses/{openai_chat.id}'
-    auth = {"Authorization": f"Bearer {openai_key}"}
-    response = requests.get(url, headers=auth)
-    print("Response Rate Limits:")
-    for header_name, header_value in response.headers.items():
-        print(f"* {header_name}: {header_value}")
+
+    """ Prints the response metadata """
+    print(openai_chat.metadata)
 
 except openai.APITimeoutError as e:
     print(f"""OpenAI API request took too long to complete:
@@ -140,8 +134,6 @@ if feedback_message.endswith(FENCE):
 
 
 """ Writes feedback to markdown file """
-code_review = f"""## OpenAI Code Review
-    {feedback_message}
-    """
+code_review = f"## OpenAI Code Review\n{feedback_message.strip()}\n"
 with open("feedback.md", "w") as file:
     file.write(code_review)

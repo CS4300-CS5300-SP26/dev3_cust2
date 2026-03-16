@@ -45,7 +45,7 @@ jobs:
       # Installs Python with latest architecture
       # Last updated March 16, 2026
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.14.3
           architecture: x64
