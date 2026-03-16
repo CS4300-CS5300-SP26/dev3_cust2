@@ -17,16 +17,31 @@
 import openai
 from openai import OpenAI
 import os
+import shutil
 
 
 """ Constants declared for efficiency """
 FENCE = "```"
 MAX_DIFF = 15000
+BANNED_STRINGS = ["KEY =", "KEY=", "TOKEN =", "TOKEN="]
+
+
+""" Function to remove potential secrets from diff """
+def scrub_diff(diff_file):
+    temp_file = diff_file + '.temp'
+    with open(diff_file, 'r') as infile, open(temp_file, 'w') as outfile:
+        for line in infile:
+            if not any(s in line for s in BANNED_STRINGS):
+                outfile.write(line)
+    
+    # Replace the original diff with scrubbed diff
+    shutil.move(temp_file, diff_file)
 
 
 """ Read the diff """
 if not os.path.exists("diff.txt"):
     raise RuntimeError('Failed to find diff file')
+scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
 if len(diff) > MAX_DIFF:
@@ -84,6 +99,7 @@ try:
         input=input_content
     )
     feedback_message = openai_chat.output_text 
+    print(f"Response ID: {openai_chat.id}")
 
 except openai.APITimeoutError as e:
     print(f"""OpenAI API request took too long to complete:
