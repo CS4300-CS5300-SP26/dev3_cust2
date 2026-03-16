@@ -1,11 +1,12 @@
 """
     Contributed by Devin Haggitt
-    Created March 15, 2026
+    Modified March 16, 2026
 
     Function: This script will conduct an AI
     code review for each pull request ran on the system
 
-    Used https://github.com/UCCS-SP25-CS4300-CS5300-1/Group-8-spring-2025/blob/main/ai-code-review.py
+    Used https://github.com/UCCS-SP25-CS4300-CS5300-1/
+        Group-8-spring-2025/blob/main/ai-code-review.py
     as a resource for constructing
 """
 
@@ -19,43 +20,49 @@ FENCE = "```"
 
 
 """ Read the diff """
+if not os.path.exists("diff.txt"):
+    raise RuntimeError('Failed to find diff file')
 with open("diff.txt", "r") as file:
     diff = file.read()
 
 
 """ Query ChatGPT """
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+try:
+    client.models.list()
+except openai.AuthenticationError:
+    raise RuntimeError('OpenAI API Key invalid')
 
 
 """ Initialize System and User request messages """
 system_content = """
-    You are an industry expert in Advanced Software Engineering teaching a 
+    You are an industry expert in Advanced Software Engineering teaching a
     class to future software engineers in a University. You are preparing
-    a code review for a select group of students on their Django project. 
-    
+    a code review for a select group of students on their Django project.
+
     This project aims to implement a production-level website that provides
     Software-as-a-Service (SaaS), that could be used in commercial environments
-    and provide an extensive example in each student's portfolio. 
-    
-    Provide concise, actionable feedback, as if you were the supervisor 
+    and provide an extensive example in each student's portfolio.
+
+    Provide concise, actionable feedback, as if you were the supervisor
     of a team containing these students.
     """
 
 user_content = f"""
-    Provide concise, actionable feedback in Markdown format (do not create a file), with 
-    specific attention to pre-established Django convention, security, and code efficency. 
-    
-    For each suggestion, provide the file name and line number best associated with that suggestion,
-    so a student can immediately reference and apply the provided feedback.
+    Provide concise, actionable feedback in Markdown format
+    (do not create a file), with specific attention to pre-established
+    Django convention, security, and code efficency.
 
-    If possible, also provide a graded rubric on style, security, code efficiency, and
-    architecture stability so the student can pinpoint areas of concern.
+    For each suggestion, provide the file name and line number best
+    associated with that suggestion, so a student can immediately reference
+    and apply the provided feedback.
+
+    If possible, also provide a graded rubric on style, security,
+    code efficiency, and architecture stability so the student
+    can pinpoint areas of concern.
 
     Use the provided pull request diff: \n{diff}
     """
-
 
 
 """ Attempt to query a response from ChatGPT """
@@ -86,7 +93,7 @@ elif feedback_message.startswith(FENCE):
 
 
 """ Remove trailing code fence if present """
-feedback_message = feedback_message.rstrip() # Removes trailing whitespace
+feedback_message = feedback_message.rstrip()  # Removes trailing whitespace
 if feedback_message.endswith(FENCE):
     feedback_message = feedback_message[:len(feedback_message) - len(FENCE)]
 

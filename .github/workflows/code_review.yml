@@ -1,3 +1,10 @@
+# Contributed by Devin Haggitt
+# Modified March 16, 2026
+
+# Function: This automation file will conduct a code
+# review on each pull request in the repository, using
+# prompts to OpenAI's ChatGPT
+
 # Inspired by the AI Code Review workflow found at
 # https://github.com/UCCS-SP25-CS4300-CS5300-1/Group-8-spring-2025.
 # Updated to use recent packages
@@ -12,7 +19,10 @@ name: OpenAI Code Review
 #     to account for previous merges
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 # Only allows the supplied token permission to read
 # the contents of the repo, and write to pull-requests
@@ -20,6 +30,8 @@ permissions:
   contents: read
   pull-requests: write
 
+# List of jobs to conduct AI code review
+# Posts the review to the associated pull request
 jobs:
   ai_review:
     runs-on: ubuntu-latest
@@ -31,18 +43,17 @@ jobs:
           fetch-depth: 2
       
       # Installs Python with latest architecture
+      # Last updated March 16, 2026
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
           python-version: 3.14.3
           architecture: x64
+          cache: 'pip'  # Caches pip dependencies
       
-      # Installs openai library and requirements.txt
+      # Installs Python dependencies using pip cache
       - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install openai
-      #   pip install -r requirements.txt   # commented out until created
+        run: pip install -r requirements.txt
       
       # Run a diff on the PR and main
       - name: Get PR Diff
