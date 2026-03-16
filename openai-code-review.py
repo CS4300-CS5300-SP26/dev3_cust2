@@ -3,7 +3,11 @@
     Modified March 16, 2026
 
     Function: This script will conduct an AI
-    code review for each pull request ran on the system
+    code review for each pull request ran on the system.
+    
+    *** Currently limited to pull requests with diff files
+    under 15000 characters. Need to expand the functionality
+    for bigger pull requests to break up the diff file ***
 
     Used https://github.com/UCCS-SP25-CS4300-CS5300-1/
         Group-8-spring-2025/blob/main/ai-code-review.py
@@ -24,7 +28,9 @@ MAX_DIFF = 15000
 if not os.path.exists("diff.txt"):
     raise RuntimeError('Failed to find diff file')
 with open("diff.txt", "r") as file:
-    diff = file.read()[:MAX_DIFF]
+    diff = file.read()
+if len(diff) > MAX_DIFF:
+    raise RuntimeError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
 
 
 """ Assign the OpenAI API key to a variable """
@@ -77,11 +83,7 @@ try:
         instructions=instructions_content,
         input=input_content
     )
-    feedback_message = openai_chat.output_text
-
-
-    """ Prints the response metadata """
-    print(openai_chat.metadata)
+    feedback_message = openai_chat.output_text 
 
 except openai.APITimeoutError as e:
     print(f"""OpenAI API request took too long to complete:
