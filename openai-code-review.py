@@ -13,7 +13,6 @@
 import openai
 from openai import OpenAI
 import os
-import requests
 
 
 """ Constants declared for efficiency """
