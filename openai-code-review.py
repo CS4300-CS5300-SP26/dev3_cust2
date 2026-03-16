@@ -70,7 +70,7 @@ input_content = f"""
 """ Attempt to query a response from ChatGPT """
 try:
     openai_chat = client.responses.create(
-        model="gpt-5.1-codex-mini"
+        model="gpt-5.1-codex-mini",
         instructions=instructions_content,
         input=input_content
     )
