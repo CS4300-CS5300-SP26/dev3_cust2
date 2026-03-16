@@ -31,7 +31,7 @@ with open("diff.txt", "r") as file:
 """ Assign the OpenAI API key to a variable """
 openai_key = os.getenv("OPENAI_API_KEY")
 if not openai_key:
-    raise RuntimeError(
+    raise ValueError(
         "No API key found. Set the OPENAI_API_KEY environment variable.")
 
 
@@ -84,7 +84,7 @@ try:
     
     """ Pulls the rate limits of the response using curl """
     url = f'https://api.openai.com/responses/{openai_chat.id}'
-    auth = f"Authorization: Bearer {openai_key}"
+    auth = {"Authorization": f"Bearer {openai_key}"}
     response = requests.get(url, headers=auth)
     print("Response Rate Limits:")
     for header_name, header_value in response.headers.items():

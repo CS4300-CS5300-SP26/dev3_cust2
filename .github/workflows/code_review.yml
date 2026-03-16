@@ -83,6 +83,6 @@ jobs:
 
       # Runs cleanup on created files
       - name: Cleanup Temp Files
-        run: rm diff.txt feedback.md
+        run: rm -f diff.txt feedback.md
 
 
