@@ -24,8 +24,8 @@ MAX_DIFF = 15000
 """ Read the diff """
 if not os.path.exists("diff.txt"):
     raise RuntimeError('Failed to find diff file')
-with open("diff.txt", "r") as file:
-    file = file.truncate(MAX_DIFF)
+with open("diff.txt", "r+") as file:
+    file.truncate(MAX_DIFF)
     diff = file.read()
 
 
