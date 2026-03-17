@@ -1,3 +1,6 @@
 # Ignore Python bytecode directories and files
 __pycache__/
 *.pyc
+
+#Ignore Staticfiles
+hiddengems/staticfiles/
