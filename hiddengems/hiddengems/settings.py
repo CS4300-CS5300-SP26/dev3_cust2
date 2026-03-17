@@ -79,12 +79,12 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE':'django.db.backends.postgresql_psycopg2',
-		'NAME':'hiddengems',
-		'USER':'admin',
-		'PASSWORD':'AdminPassword1',
-		'HOST':'localhost',
-		'PORT':'',
+		'ENGINE': 'django.db.backends.postgresql_psycopg2',
+		'NAME': 'hiddengems',
+		'USER': 'admin',
+		'PASSWORD': 'AdminPassword1',
+		'HOST': 'localhost',
+		'PORT': '',
 		}
 	}
 
