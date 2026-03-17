@@ -2,5 +2,8 @@
 __pycache__/
 *.pyc
 
+# Ignore SSH keys if present
+.ssh
+
 #Ignore Staticfiles
 hiddengems/staticfiles/
