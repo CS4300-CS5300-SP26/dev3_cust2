@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-card {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .game-title {
+            font-size: 2rem;
+            margin: 0 0 16px;
+        }
+
+        .game-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .game-meta p {
+            margin: 8px 0;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <h1 class="game-title">{{ title }}</h1>
+
+        <div class="game-description">
+            {{ description }}
+        </div>
+
+        <div class="game-meta">
+            <p><span class="label">Publisher:</span> {{ publisher }}</p>
+            <p><span class="label">Developer:</span> {{ developer }}</p>
+        </div>
+    </div>
+</body>
+</html>
