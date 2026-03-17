@@ -23,7 +23,10 @@ import shutil
 """ Constants declared for efficiency """
 FENCE = "```"
 MAX_DIFF = 15000
-BANNED_STRINGS = ["KEY =", "KEY=", "TOKEN =", "TOKEN="]
+
+
+""" Secret strings variable for diff scrubbing """
+secret_strings = ["KEY =", "KEY=", "TOKEN =", "TOKEN="]
 
 
 """ Function to remove potential secrets from diff """
@@ -31,7 +34,7 @@ def scrub_diff(diff_file):
     temp_file = diff_file + '.temp'
     with open(diff_file, 'r') as infile, open(temp_file, 'w') as outfile:
         for line in infile:
-            if not any(s in line for s in BANNED_STRINGS):
+            if not any(s in line for s in secret_strings):
                 outfile.write(line)
     
     # Replace the original diff with scrubbed diff
@@ -45,7 +48,9 @@ scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
 if len(diff) > MAX_DIFF:
-    raise RuntimeError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
+    raise ValueError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
+    print("Recommendation to break the diff into reviewable commits")
+    diff = diff[:MAX_DIFF]
 
 
 """ Assign the OpenAI API key to a variable """
@@ -84,7 +89,7 @@ input_content = f"""
 
     If possible, also provide a graded rubric on style, security,
     code efficiency, and architecture stability so the student
-    can pinpoint areas of concern.
+    can pinpoint areas of concern. Give rubric scores out of 100.
 
     Use the provided pull request diff: \n{diff}
     """
@@ -99,7 +104,8 @@ try:
         input=input_content
     )
     feedback_message = openai_chat.output_text 
-    print(f"Response ID: {openai_chat.id}")
+    response_id = openai_chat.id
+    print(f"Response ID: {response_id}")
 
 except openai.APITimeoutError as e:
     print(f"""OpenAI API request took too long to complete:
