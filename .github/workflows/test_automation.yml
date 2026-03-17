@@ -60,11 +60,6 @@ jobs:
           cd hiddengems
           sed -i 's/DEBUG = True/DEBUG = False/' hiddengems/settings.py
           python manage.py collectstatic --noinput
-
-      # Captures the output of the below commands
-      - name: Setup Output Capture
-        uses: selfagency/capture-output@v2
-        with:
       
       # Runs the automated tests
       - name: Run Tests on Django
