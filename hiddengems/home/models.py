@@ -8,6 +8,11 @@ class Game(models.Model):
     publisher = models.CharField(max_length=200)
     developer = models.CharField(max_length=200)
 
+    #Steam Integration
+    storefront = models.CharField(max_length=50, default="steam")
+    price = models.DecimalField(decimal_places=2, max_digits=10)
+    game_id = models.IntegerField()
+
     #Slugification for url
     def save(self, *args, **kwargs):
         if not self.slug:
