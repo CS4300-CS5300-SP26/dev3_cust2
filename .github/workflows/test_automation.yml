@@ -58,7 +58,7 @@ jobs:
         run: |
           cd hiddengems
           sed -i 's/DEBUG = True/DEBUG = False/' hiddengems/settings.py
-          python manage.py collectstatic
+          python manage.py collectstatic --noinput
       
       # Runs the automated tests
       - name: Run Tests on Django
