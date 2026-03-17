@@ -80,7 +80,11 @@ jobs:
       - name: Comment Coverage Results
         uses: thollander/actions-comment-pull-request@v3
         with:
-          file-path: coverage.txt
+          message: |
+            ## Coverage.yml Results
+            ```
+            {{ cat coverage.txt }}
+            ```
 
       # Runs cleanup on created files
       - name: Cleanup coverage.txt
