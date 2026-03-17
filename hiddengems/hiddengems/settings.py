@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databas
+# https://docs.djangoproject.com/en/4.2/ref/settings/#database
 
 DATABASES = {
 	'default': {
