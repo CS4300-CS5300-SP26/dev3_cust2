@@ -26,8 +26,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", 
-                "127.0.0.1,localhost,24.199.106.168").split(",")
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
+                          "127.0.0.1,localhost,24.199.106.168").split(",")
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
@@ -78,15 +78,15 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databas
 
 DATABASES = {
-	'default': {
-		'ENGINE':'django.db.backends.postgresql_psycopg2',
-		'NAME':'hiddengems',
-		'USER':'admin',
-		'PASSWORD':'AdminPassword1',
-		'HOST':'localhost',
-		'PORT':'',
-		}
-	}
+    'default': {
+        'ENGINE':'django.db.backends.postgresql_psycopg2',
+        'NAME':'hiddengems',
+        'USER':'admin',
+        'PASSWORD':'AdminPassword1',
+        'HOST':'localhost',
+        'PORT':'',
+        }
+    }
 
 
 # Password validation
