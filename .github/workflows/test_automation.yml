@@ -60,6 +60,11 @@ jobs:
           cd hiddengems
           sed -i 's/DEBUG = True/DEBUG = False/' hiddengems/settings.py
           python manage.py collectstatic --noinput
+
+      # Captures the output of the below commands
+      - name: Setup Output Capture
+        uses: selfagency/capture-output@v2
+        with:
       
       # Runs the automated tests
       - name: Run Tests on Django
@@ -67,13 +72,22 @@ jobs:
         run: |
           cd hiddengems
           coverage run --source='.' manage.py test
-          coverage report -m --fail-under=70
+          coverage report -m --fail-under=70 | tee coverage.txt
 
       # Uploads the output from Test Coverage
       - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: coverage.txt
+
+      # Comments the coverage on the pull request
+      - name: Comment Coverage Results
         uses: thollander/actions-comment-pull-request@v3
         with:
-          message: |
-            ## Django Test Coverage
-            ${{ steps.test-coverage.outputs.* }}
+          file-path: coverage.txt
+
+      # Runs cleanup on created files
+      - name: Cleanup coverage.txt
+        run: rm -f coverage.txt
       
