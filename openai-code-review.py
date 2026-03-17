@@ -47,10 +47,10 @@ if not os.path.exists("diff.txt"):
 scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
-if len(diff) > MAX_DIFF:
-    raise ValueError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
-    print("Recommendation to break the diff into reviewable commits")
-    diff = diff[:MAX_DIFF]
+# if len(diff) > MAX_DIFF:
+#     raise ValueError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
+#     print("Recommendation to break the diff into reviewable commits")
+#     diff = diff[:MAX_DIFF]
 
 
 """ Assign the OpenAI API key to a variable """
