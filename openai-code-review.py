@@ -22,7 +22,7 @@ import shutil
 
 """ Constants declared for efficiency """
 FENCE = "```"
-MAX_DIFF = 15000
+MAX_DIFF = 150000
 
 
 """ Secret strings variable for diff scrubbing """
