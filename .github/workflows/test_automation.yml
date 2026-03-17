@@ -62,8 +62,17 @@ jobs:
       
       # Runs the automated tests
       - name: Run Tests on Django
+        id: test-coverage
         run: |
           cd hiddengems
           coverage run --source='.' manage.py test
           coverage report -m --fail-under=80
+
+      # Uploads the output from Test Coverage
+      - name: Upload Coverage
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ## Django Test Coverage
+            ${{ steps.test-coverage.outputs.* }}
       
