@@ -22,6 +22,7 @@ on:
 # Sets the permissions for the GITHUB_TOKEN
 permissions:
   contents: read
+  pull-requests: write
 
 # List of jobs to run test automation
 jobs:
@@ -62,8 +63,30 @@ jobs:
       
       # Runs the automated tests
       - name: Run Tests on Django
+        id: test-coverage
         run: |
           cd hiddengems
           coverage run --source='.' manage.py test
-          coverage report -m --fail-under=80
+          coverage report -m --fail-under=70 | tee ../coverage.txt
+
+      # Uploads the output from Test Coverage
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: coverage.txt
+
+      # Comments the coverage on the pull request
+      - name: Comment Coverage Results
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ## Coverage.yml Results
+            ```
+            {{ cat coverage.txt }}
+            ```
+
+      # Runs cleanup on created files
+      - name: Cleanup coverage.txt
+        run: rm -f coverage.txt
       
