@@ -25,11 +25,14 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
                     "127.0.0.1,localhost,24.199.106.168,app-jroyer-21.devedu.io").split(",")
 
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+CSRF_TRUSTED_ORIGINS = ['http://24.199.106.168']
+
+
 
 # Application definition
 
@@ -77,16 +80,26 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#database
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql_psycopg2',
-		'NAME': 'hiddengems',
-		'USER': 'admin',
-		'PASSWORD': 'AdminPassword1',
-		'HOST': 'localhost',
-		'PORT': '',
-		}
-	}
+USE_POSTGRES = os.getenv("USE_POSTGRES", "False") == "True"
+
+if USE_POSTGRES:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.getenv("POSTGRES_DB", "hiddengems"),
+            "USER": os.getenv("POSTGRES_USER", "admin"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "AdminPassword1"),
+            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -126,6 +139,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "home/static")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
