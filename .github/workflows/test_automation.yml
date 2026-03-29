@@ -1,0 +1,92 @@
+# Contributed by Devin Haggitt
+# Modified March 16, 2026
+
+# Function: This automation file will conduct automated
+# tests on the repository whenever a push or pull-request
+# is made
+
+# Inspired by the Django Tests workflow found at
+# https://github.com/UCCS-SP25-CS4300-CS5300-1/Group-8-spring-2025.
+# Updated to use recent packages
+
+name: Django Test Automation
+
+# Runs on pull requests made to main
+# and pushes made to any branch
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ "main" ]
+
+# Sets the permissions for the GITHUB_TOKEN
+permissions:
+  contents: read
+  pull-requests: write
+
+# List of jobs to run test automation
+jobs:
+  test-auto:
+    runs-on: ubuntu-latest
+    
+    # Creates 4 parallel jobs to run with different
+    # combinations of variables
+    strategy:
+      max-parallel: 4
+      
+    steps:
+      # Runs checkout on the codebase
+      - name: Checkout Code
+        uses: actions/checkout@v6
+      
+      # Installs Python with latest architecture
+      # Last updated March 17, 2026
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.14.3
+          architecture: x64
+          cache: 'pip'  # Caches pip dependencies
+      
+      # Installs Python dependencies using pip cache
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      
+      # Recreates the Production Environment in Django
+      - name: Recreate Production Environment
+        run: |
+          cd hiddengems
+          sed -i 's/DEBUG = True/DEBUG = False/' hiddengems/settings.py
+          python manage.py collectstatic --noinput
+      
+      # Runs the automated tests
+      - name: Run Tests on Django
+        id: test-coverage
+        run: |
+          cd hiddengems
+          coverage run --source='.' manage.py test
+          coverage report -m --fail-under=70 | tee ../coverage.txt
+
+      # Uploads the output from Test Coverage
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: coverage.txt
+
+      # Comments the coverage on the pull request
+      - name: Comment Coverage Results
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ## Coverage.yml Results
+            ```
+            {{ cat coverage.txt }}
+            ```
+
+      # Runs cleanup on created files
+      - name: Cleanup coverage.txt
+        run: rm -f coverage.txt
+      

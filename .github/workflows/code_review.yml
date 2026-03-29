@@ -1,0 +1,90 @@
+# Contributed by Devin Haggitt
+# Modified March 16, 2026
+
+# Function: This automation file will conduct a code
+# review on each pull request in the repository, using
+# prompts to OpenAI's ChatGPT
+
+# Inspired by the AI Code Review workflow found at
+# https://github.com/UCCS-SP25-CS4300-CS5300-1/Group-8-spring-2025.
+# Updated to use recent packages
+
+name: OpenAI Code Review
+
+# Runs on pull requests when they are:
+#   - opened: when a pull request is first opened
+#   - reopened: when a pull request is reopened 
+#     after being closed
+#   - synchronize: when a pull request is updated
+#     to account for previous merges
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+# Only allows the supplied token permission to read
+# the contents of the repo, and write to pull-requests
+permissions:
+  contents: read
+  pull-requests: write
+
+# List of jobs to conduct AI code review
+# Posts the review to the associated pull request
+jobs:
+  ai_review:
+    runs-on: ubuntu-latest
+    steps:
+      # Pulls the latest data on the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      
+      # Installs Python with latest architecture
+      # Last updated March 16, 2026
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.14.3
+          architecture: x64
+          cache: 'pip'  # Caches pip dependencies
+      
+      # Installs Python dependencies using pip cache
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      
+      # Run a diff on the PR and main
+      - name: Get PR Diff
+        run: |
+          git fetch
+          git diff origin/${{ github.event.pull_request.base.ref }} > diff.txt
+      
+      # Run the AI Code Review script using OpenAI
+      - name: Run AI Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python openai-code-review.py
+      
+      # Uploads the review artifact to be attached to pull request
+      - name: Upload Review Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: review-artifacts
+          path: feedback.md
+      
+      # Comments the feedback artifact on the pull request
+      - name: Comment feedback.md
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: feedback.md
+
+      # Runs cleanup on created files
+      - name: Cleanup Temp Files
+        run: rm -f diff.txt feedback.md
+
+

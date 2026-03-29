@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .top-text {
+            font-size: 25px;
+        }
+
+        .bottom-text {
+            font-size: 20px;
+        }
+
+        .purchase-card {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .purchase_button {
+            border: none;
+            color: black;
+            background-color: darkcyan;
+            border-radius: 10px;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="purchase-card">
+        <a href="https://store.steampowered.com/app/{{ game_id }}" class="purchase_button">
+            <span class="top-text">Purchase</span><br>
+            <span class="bottom-text">{{ price }}</span>
+        </a>
+    </div>
+</body>
+</html>

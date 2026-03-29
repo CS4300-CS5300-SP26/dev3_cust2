@@ -1,0 +1,10 @@
+# Ignore Python bytecode directories and files
+__pycache__/
+*.pyc
+db.sqlite3
+
+# Ignore SSH keys if present
+.ssh
+
+#Ignore Staticfiles
+hiddengems/staticfiles/
