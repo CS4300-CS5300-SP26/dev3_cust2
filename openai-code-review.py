@@ -48,7 +48,7 @@ scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
 # if len(diff) > MAX_DIFF:
-#     raise ValueError(f"""Length of diff exceeds max size of 
+#     raise ValueError(f"""Length of diff exceeds max size of
 #       {MAX_DIFF} characters""")
 #     print("Recommendation to break the diff into reviewable commits")
 #     diff = diff[:MAX_DIFF]
@@ -91,8 +91,8 @@ input_content = f"""
 
     If possible, also provide an evaluation matrix on style, security, code
     efficiency, architectural stability, and Software Engineering standards so
-    the student can pinpoint exact areas of concern. Don't provide a grade/score,
-    but provide a rating with categories like "Needs Fix, Minor,
+    the student can pinpoint exact areas of concern. Don't provide a 
+    grade/score, but provide a rating with categories like "Needs Fix, Minor,
     Moderate, and Good".
 
     Use the provided pull request diff: \n{diff}
