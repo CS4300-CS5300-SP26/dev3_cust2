@@ -16,13 +16,3 @@ urlpatterns = [
     # Game purchase page accessed by game ID
     path('game/<int:game_id>/', views.purchase_game, name='purchase_game'),
 ]
-```
-
-Run:
-```
-nano /home/student/dev3_cust2/hiddengems/home/urls.py
-```
-
-Paste it in, save with `Ctrl+X`, `Y`, `Enter`. Then check for any remaining conflicts:
-```
-grep -r "<<<<<<" ~/dev3_cust2 --include="*.py" -l
