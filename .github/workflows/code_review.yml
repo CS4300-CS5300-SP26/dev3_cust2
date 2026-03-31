@@ -60,7 +60,7 @@ jobs:
       # Run a diff on the PR and main
       - name: Get PR Diff
         env:
-          GH_TOKEN: $${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
