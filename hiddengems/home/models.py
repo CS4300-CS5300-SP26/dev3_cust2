@@ -1,23 +1,58 @@
 from django.db import models
 from django.utils.text import slugify
+from django.contrib.auth.models import User
 
+
+# Game model stores all information about a developer's uploaded game
 class Game(models.Model):
+
+    # Title of the game
     title = models.CharField(max_length=200)
+
+    # URL-friendly slug generated from title
     slug = models.SlugField(unique=True, blank=True)
+
+    # Full description of the game (story, mechanics, etc.)
     description = models.TextField()
-    publisher = models.CharField(max_length=200)
-    developer = models.CharField(max_length=200)
 
-    #Steam Integration
+    # The developer who uploaded the game
+    # Linked to Django's built-in User model
+    developer = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Publisher of the game
+    publisher = models.CharField(max_length=200, blank=True)
+
+    # Price of the game
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # Genre of the game (RPG, puzzle, platformer, etc.)
+    genre = models.CharField(max_length=100, blank=True)
+
+    # Indicates if the game can run directly in the browser
+    playable_in_browser = models.BooleanField(default=False)
+
+    # Other platforms the game is available on (Steam, itch.io, etc.)
+    other_platforms = models.CharField(max_length=200, blank=True)
+
+    # Thumbnail image displayed on the game page
+    thumbnail = models.FileField(upload_to='game_thumbnails/', blank=True)
+
+    # Optional uploaded build (zip or web build)
+    build_file = models.FileField(upload_to='game_builds/', blank=True)
+
+    # Steam Integration
     storefront = models.CharField(max_length=50, default="steam")
-    price = models.DecimalField(decimal_places=2, max_digits=10)
-    game_id = models.IntegerField()
+    game_id = models.IntegerField(null=True, blank=True)
 
-    #Slugification for url
+    # Automatically records when the game was uploaded
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Auto-generate slug from title if not provided
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    # String representation of the object in admin panel
     def __str__(self):
         return self.title

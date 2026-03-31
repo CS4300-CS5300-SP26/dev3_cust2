@@ -1,10 +1,18 @@
 from django.urls import path
-from .views import index
-from .views import game_detail
-from .views import purchase_game
+from . import views
 
+# URL patterns for the home app
 urlpatterns = [
-    path('', index, name='index'),
-    path("game/<slug:slug>/", game_detail, name="game_detail"),
-    path('game/<int:game_id>/', purchase_game, name='purchase_game')
+    # Homepage
+    path('', views.index, name='index'),
+
+    # Page where developers upload their games
+    # Accessible at: /upload/
+    path('upload/', views.upload_game, name='upload_game'),
+
+    # Game detail page accessed by slug
+    path("game/<slug:slug>/", views.game_detail, name="game_detail"),
+
+    # Game purchase page accessed by game ID
+    path('game/<int:game_id>/', views.purchase_game, name='purchase_game'),
 ]

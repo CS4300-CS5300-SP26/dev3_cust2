@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -77,17 +78,39 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#database
 
+"""
+#commenting out this code to try a different database method temporarily
 DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql_psycopg2',
-		'NAME': 'hiddengems',
-		'USER': 'admin',
-		'PASSWORD': 'AdminPassword1',
-		'HOST': 'localhost',
-		'PORT': '',
-		}
-	}
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'hiddengems',
+        'USER': 'admin',
+        'PASSWORD': 'AdminPassword1',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+#Trying this instead:
+"""
 
+if os.environ.get("USE_SQLITE") == "true":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'hiddengems',
+            'USER': 'admin',
+            'PASSWORD': 'AdminPassword1',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -131,5 +154,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# URL used to access uploaded media files
+MEDIA_URL = "/media/"
+
+# Folder where uploaded files will be stored
+MEDIA_ROOT = BASE_DIR / "media"
+
+LOGIN_URL = '/'
 
 CSRF_TRUSTED_ORIGINS = ["https://app-bcurtis-21.devedu.io"]
