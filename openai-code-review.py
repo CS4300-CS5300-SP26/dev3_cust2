@@ -89,9 +89,11 @@ input_content = f"""
     and apply the provided feedback. Also, provide details on the severity
     of the concern, so the student can understand areas of high risk.
 
-    If possible, also provide an evaluation on style, security, code
+    If possible, also provide an evaluation matrix on style, security, code
     efficiency, architectural stability, and Software Engineering standards so
-    the student can pinpoint exact areas of concern.
+    the student can pinpoint exact areas of concern. Don't provide a grade/score,
+    but provide a rating with categories like "Needs Fix, Minor,
+    Moderate, and Good".
 
     Use the provided pull request diff: \n{diff}
     """
