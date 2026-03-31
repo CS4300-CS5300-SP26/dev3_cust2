@@ -1,5 +1,5 @@
 # Contributed by Devin Haggitt
-# Modified March 16, 2026
+# Modified March 31, 2026
 
 # Function: This automation file will conduct a code
 # review on each pull request in the repository, using
@@ -59,9 +59,17 @@ jobs:
       
       # Run a diff on the PR and main
       - name: Get PR Diff
+        env:
+          GH_TOKEN: $${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          git fetch
-          git diff origin/${{ github.event.pull_request.base.ref }} > diff.txt
+          gh api repos/${REPO}/pulls/${PR_NUMBER} \
+            -H "Accept: application/vnd.github.diff" > diff.txt
+          if [ ! -s diff.txt ]; then
+            echo "::error::Failed to retrieve PR diff or diff is empty."
+            exit 1
+          fi
       
       # Run the AI Code Review script using OpenAI
       - name: Run AI Review
