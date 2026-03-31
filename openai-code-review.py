@@ -85,11 +85,12 @@ input_content = f"""
 
     For each suggestion, provide the file name and line number best
     associated with that suggestion, so a student can immediately reference
-    and apply the provided feedback.
+    and apply the provided feedback. Also, provide details on the severity
+    of the concern, so the student can understand areas of high risk.
 
-    If possible, also provide a graded rubric on style, security,
-    code efficiency, and architecture stability so the student
-    can pinpoint areas of concern. Give rubric scores out of 100.
+    If possible, also provide an evaluation on style, security, code
+    efficiency, architectural stability, and Software Engineering standards so
+    the student can pinpoint exact areas of concern. 
 
     Use the provided pull request diff: \n{diff}
     """
