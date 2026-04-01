@@ -17,7 +17,7 @@ class Game(models.Model):
 
     # The developer who uploaded the game
     # Linked to Django's built-in User model
-    developer = models.ForeignKey(User, on_delete=models.CASCADE)
+    developer = models.CharField(max_length=200, blank=True)
 
     # Publisher of the game
     publisher = models.CharField(max_length=200, blank=True)
