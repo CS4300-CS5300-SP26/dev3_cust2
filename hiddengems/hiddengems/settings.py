@@ -30,7 +30,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 os.environ['USE_SQLITE'] = "true"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                    "127.0.0.1,localhost,24.199.106.168,app-jroyer-21.devedu.io,app-bcurtis-21.devedu.io").split(",")
+                    "127.0.0.1,localhost,24.199.106.168,app-jroyer-21.devedu.io").split(",")
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
