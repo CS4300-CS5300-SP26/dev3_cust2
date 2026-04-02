@@ -31,11 +31,6 @@ class GameAdmin(admin.ModelAdmin):
                 name="home_game_sync_update_all",
             ),
             path(
-                "sync-add-missing/",
-                self.admin_site.admin_view(self.sync_add_missing_view),
-                name="home_game_sync_add_missing",
-            ),
-            path(
                 "sync-update-one/",
                 self.admin_site.admin_view(self.sync_update_one_view),
                 name="home_game_sync_update_one",
@@ -45,36 +40,12 @@ class GameAdmin(admin.ModelAdmin):
 
 
     def sync_update_all_view(self, request):
-        api_key = os.environ.get("STEAM_WEB_API_KEY")
-
-        if not api_key:
-            messages.error(request, "STEAM_WEB_API_KEY is missing from settings.py")
-            return HttpResponseRedirect(reverse("admin:home_game_changelist"))
-
-        try:
-            app_list = self.fetch_store_app_list(api_key=api_key, max_results=25)
-        except Exception as e:
-            messages.error(request, f"Could not fetch Steam app list: {e}")
-            return HttpResponseRedirect(reverse("admin:home_game_changelist"))
-
         created_count = 0
         updated_count = 0
         failed_count = 0
-        skipped_count = 0
 
-        for app in app_list:
+        for steam_id in range(800, 901):
             try:
-                steam_id = app.get("appid")
-                name = (app.get("name") or "").strip()
-
-                if not steam_id or not str(steam_id).isdigit():
-                    skipped_count += 1
-                    continue
-
-                if not name:
-                    skipped_count += 1
-                    continue
-
                 steam_data = self.fetch_steam_game_data(str(steam_id))
                 game, created = self.upsert_steam_game(str(steam_id), steam_data)
 
@@ -90,18 +61,12 @@ class GameAdmin(admin.ModelAdmin):
             messages.success(request, f"Created {created_count} Steam game(s).")
         if updated_count:
             messages.success(request, f"Updated {updated_count} Steam game(s).")
-        if skipped_count:
-            messages.info(request, f"Skipped {skipped_count} app(s).")
         if failed_count:
-            messages.warning(request, f"{failed_count} app(s) failed during import.")
+            messages.warning(request, f"{failed_count} Steam ID(s) failed or were skipped.")
 
-        if not any([created_count, updated_count, skipped_count, failed_count]):
-            messages.info(request, "No Steam apps were processed.")
+        if not any([created_count, updated_count, failed_count]):
+            messages.info(request, "No Steam IDs were processed.")
 
-        return HttpResponseRedirect(reverse("admin:home_game_changelist"))
-
-    def sync_add_missing_view(self, request):
-        messages.info(request, "Not implemented yet.")
         return HttpResponseRedirect(reverse("admin:home_game_changelist"))
 
     def sync_update_one_view(self, request):
@@ -201,38 +166,3 @@ class GameAdmin(admin.ModelAdmin):
             game.save()
 
         return game, created
-
-    def fetch_store_app_list(self, api_key, last_appid=None, max_results=25):
-        params = {
-            "key": api_key,
-            "max_results": max_results,
-            "include_games": "true",
-            "include_dlc": "false",
-            "include_software": "false",
-            "include_videos": "false",
-            "include_hardware": "false",
-            "input_json": "1",
-        }
-
-        if last_appid is not None:
-            params["last_appid"] = last_appid
-
-        url = "https://api.steampowered.com/ISteamApps/GetAppList/v2" + urlencode(params)
-
-        try:
-            with urlopen(url) as response:
-                payload = json.load(response)
-        except HTTPError as exc:
-            raise ValueError(f"Steam app list HTTP error: {exc.code}")
-        except URLError as exc:
-            raise ValueError(f"Could not reach Steam app list endpoint: {exc}")
-        except json.JSONDecodeError:
-            raise ValueError("Steam app list returned invalid JSON.")
-
-        response_data = payload.get("response", {})
-        apps = response_data.get("apps", [])
-
-        if not isinstance(apps, list):
-            raise ValueError("Steam app list response format was unexpected.")
-
-        return apps
