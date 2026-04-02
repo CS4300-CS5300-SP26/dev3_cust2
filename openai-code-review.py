@@ -4,7 +4,7 @@
 
     Function: This script will conduct an AI
     code review for each pull request ran on the system.
-    
+
     *** Currently limited to pull requests with diff files
     under 15000 characters. Need to expand the functionality
     for bigger pull requests to break up the diff file ***
@@ -36,7 +36,7 @@ def scrub_diff(diff_file):
         for line in infile:
             if not any(s in line for s in secret_strings):
                 outfile.write(line)
-    
+
     # Replace the original diff with scrubbed diff
     shutil.move(temp_file, diff_file)
 
@@ -48,7 +48,8 @@ scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
 # if len(diff) > MAX_DIFF:
-#     raise ValueError(f'Length of diff exceeds max size of {MAX_DIFF} characters')
+#     raise ValueError(f"""Length of diff exceeds max size of
+#       {MAX_DIFF} characters""")
 #     print("Recommendation to break the diff into reviewable commits")
 #     diff = diff[:MAX_DIFF]
 
@@ -85,11 +86,14 @@ input_content = f"""
 
     For each suggestion, provide the file name and line number best
     associated with that suggestion, so a student can immediately reference
-    and apply the provided feedback.
+    and apply the provided feedback. Also, provide details on the severity
+    of the concern, so the student can understand areas of high risk.
 
-    If possible, also provide a graded rubric on style, security,
-    code efficiency, and architecture stability so the student
-    can pinpoint areas of concern. Give rubric scores out of 100.
+    If possible, also provide an evaluation matrix on style, security, code
+    efficiency, architectural stability, and Software Engineering standards so
+    the student can pinpoint exact areas of concern. Don't provide a 
+    grade/score, but provide a rating with categories like "Needs Fix, Minor,
+    Moderate, and Good".
 
     Use the provided pull request diff: \n{diff}
     """
@@ -103,7 +107,7 @@ try:
         instructions=instructions_content,
         input=input_content
     )
-    feedback_message = openai_chat.output_text 
+    feedback_message = openai_chat.output_text
     response_id = openai_chat.id
     print(f"Response ID: {response_id}")
 
