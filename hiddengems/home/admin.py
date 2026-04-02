@@ -40,34 +40,56 @@ class GameAdmin(admin.ModelAdmin):
 
 
     def sync_update_all_view(self, request):
-        created_count = 0
-        updated_count = 0
-        failed_count = 0
+        if request.method == "POST":
+            start_id = request.POST.get("start_id", "").strip()
+            end_id = request.POST.get("end_id", "").strip()
 
-        for steam_id in range(800, 901):
-            try:
-                steam_data = self.fetch_steam_game_data(str(steam_id))
-                game, created = self.upsert_steam_game(str(steam_id), steam_data)
+            if not start_id.isdigit() or not end_id.isdigit():
+                messages.error(request, "Start ID and End ID must both be numeric.")
+                return HttpResponseRedirect(reverse("admin:home_game_sync_update_all"))
 
-                if created:
-                    created_count += 1
-                else:
-                    updated_count += 1
+            start_id = int(start_id)
+            end_id = int(end_id)
 
-            except Exception:
-                failed_count += 1
+            if start_id > end_id:
+                messages.error(request, "Start ID must be less than or equal to End ID.")
+                return HttpResponseRedirect(reverse("admin:home_game_sync_update_all"))
 
-        if created_count:
-            messages.success(request, f"Created {created_count} Steam game(s).")
-        if updated_count:
-            messages.success(request, f"Updated {updated_count} Steam game(s).")
-        if failed_count:
-            messages.warning(request, f"{failed_count} Steam ID(s) failed or were skipped.")
+            created_count = 0
+            updated_count = 0
+            failed_ids = []
 
-        if not any([created_count, updated_count, failed_count]):
-            messages.info(request, "No Steam IDs were processed.")
+            for steam_id in range(start_id, end_id + 1):
+                try:
+                    steam_data = self.fetch_steam_game_data(str(steam_id))
+                    game, created = self.upsert_steam_game(str(steam_id), steam_data)
 
-        return HttpResponseRedirect(reverse("admin:home_game_changelist"))
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
+
+                except Exception:
+                    failed_ids.append(steam_id)
+
+            if created_count:
+                messages.success(request, f"Created {created_count} Steam game(s).")
+            if updated_count:
+                messages.success(request, f"Updated {updated_count} Steam game(s).")
+            if failed_ids:
+                messages.warning(request, f"Failed IDs: {failed_ids}")
+
+            if not any([created_count, updated_count, failed_ids]):
+                messages.info(request, "No Steam IDs were processed.")
+
+            return HttpResponseRedirect(reverse("admin:home_game_changelist"))
+
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "title": "Update Steam games by range",
+        }
+        return render(request, "admin/home/game/update_range_form.html", context)
 
     def sync_update_one_view(self, request):
         if request.method == "POST":
