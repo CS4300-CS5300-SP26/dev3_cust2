@@ -17,14 +17,20 @@
       font-family: 'Poppins', sans-serif;
       color: #ffffff;
 
-      
+      /* OLD METHOD: CSS background with static tag - broken through proxy because
+         the absolute URL /static/... doesn't include /proxy/8000/ prefix
       background: 
         linear-gradient(rgba(15, 10, 35, 0.55), rgba(15, 10, 35, 0.65)),
         url("{% static 'home/images/background.webp' %}");
       background-size: cover;
       background-position: center;
-      
-      /*trying out changing this to scroll instead of fixed*/
+      background-attachment: scroll;
+      */
+
+      /* NEW METHOD: fallback color while JS loads the image */
+      background-color: #0f0a23;
+      background-size: cover;
+      background-position: center;
       background-attachment: scroll;
     }
 
@@ -145,7 +151,7 @@
       <div class="feature-card">
         <h4>Curated Discoveries</h4>
         <p class="text-secondary">
-          Explore hand-picked games that you won’t find on the front page of
+          Explore hand-picked games that you won't find on the front page of
           major storefronts.
         </p>
       </div>
@@ -181,5 +187,19 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- NEW METHOD: dynamically set background via JS so the URL resolves correctly through the proxy -->
+<script>
+  const img = new Image();
+  img.src = "{% static 'home/images/background.webp' %}";
+  img.onload = function() {
+    document.body.style.background =
+      'linear-gradient(rgba(15,10,35,0.55), rgba(15,10,35,0.65)), url("' + img.src + '")';
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'scroll';
+  };
+</script>
+
 </body>
 </html>
