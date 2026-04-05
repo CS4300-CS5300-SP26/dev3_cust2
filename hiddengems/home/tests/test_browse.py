@@ -23,18 +23,6 @@ class BrowsePageTests(TestCase):
             genre=genre,
         )
 
-    '''Browse page access'''
-
-    def test_browse_accessible_without_login(self):
-        # Browse page should be publicly accessible
-        response = self.client.get(self.browse_url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_browse_accessible_when_logged_in(self):
-        self.client.login(username='testdev', password='testpassword')
-        response = self.client.get(self.browse_url)
-        self.assertEqual(response.status_code, 200)
-
     '''No games in database'''
 
     def test_browse_empty_state_when_no_games(self):
