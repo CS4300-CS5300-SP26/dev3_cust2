@@ -169,4 +169,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = ["https://app-bcurtis-21.devedu.io"]
+CSRF_TRUSTED_ORIGINS = ["http://app-bcurtis-21.devedu.io", "http://localhost:3000"]
