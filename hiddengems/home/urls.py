@@ -6,6 +6,9 @@ urlpatterns = [
     # Homepage
     path('', views.index, name='index'),
 
+    # Browse/explore all games
+    path('browse/', views.browse, name='browse'),
+
     # Page where developers upload their games
     # Accessible at: /upload/
     path('upload/', views.upload_game, name='upload_game'),
