@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 
-
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
 
@@ -15,9 +14,14 @@ class Game(models.Model):
     # Full description of the game (story, mechanics, etc.)
     description = models.TextField()
 
-    # The developer who uploaded the game
-    # Linked to Django's built-in User model
+    # Developer name as a string (e.g. "Indie Studio X")
     developer = models.CharField(max_length=200, blank=True)
+
+    # The user who uploaded the game
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_games', null=True, blank=True)
+
+    # Users authorized to edit this game
+    authorized_users = models.ManyToManyField(User, related_name='authorized_games', blank=True)
 
     # Publisher of the game
     publisher = models.CharField(max_length=200, blank=True)
