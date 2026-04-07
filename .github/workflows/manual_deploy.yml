@@ -1,0 +1,19 @@
+# Contributed by Devin Haggitt
+# Modified April 7th, 2026
+
+# Function: This automation file will run when 
+# a push is made to main
+
+name: Build Docker and Deploy on Droplet (Manually)
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+### WORK IN PROGRESS ###
