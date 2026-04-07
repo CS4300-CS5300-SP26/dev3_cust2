@@ -12,9 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -169,4 +172,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = ["https://app-bcurtis-21.devedu.io"]
+CSRF_TRUSTED_ORIGINS = ["http://app-bcurtis-21.devedu.io", "http://localhost:3000"]
