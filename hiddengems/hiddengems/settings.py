@@ -92,27 +92,6 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '',
     }
-}
-#Trying this instead:
-"""
-
-if os.environ.get("USE_SQLITE") == "true":
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'hiddengems',
-            'USER': 'admin',
-            'PASSWORD': 'AdminPassword1',
-            'HOST': 'localhost',
-            'PORT': '',
-        }
     }
 
 # Password validation
