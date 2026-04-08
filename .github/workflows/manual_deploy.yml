@@ -28,8 +28,8 @@ jobs:
           cd /home/django/dev3_cust2/hiddengems
           git pull origin main
           pip install -r requirements.txt
-          python manage.py migrate
-          python manage.py collectstatic --noinput
+          python3 manage.py migrate
+          python3 manage.py collectstatic --noinput
           sudo systemctl restart gunicorn 
         '
 
