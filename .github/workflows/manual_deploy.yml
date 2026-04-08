@@ -29,6 +29,10 @@ jobs:
           git pull origin main
           pip install -r requirements.txt
           python3 manage.py migrate
+          export DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_ADMIN_USER }}
+          export DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_ADMIN_EMAIL }}
+          export DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_ADMIN_PASS }}
+          python3 manage.py createsuperuser --noinput
           python3 manage.py collectstatic --noinput
           sudo systemctl restart gunicorn 
         '
