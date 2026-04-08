@@ -24,7 +24,7 @@ jobs:
     
     - name: Deploy to Droplet
       run: |
-        ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@{{ secrets.DROPLET_HOST }} '
+        ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
           cd /home/django/dev3_cust2/hiddengems
           git pull origin main
           pip install -r requirements.txt
