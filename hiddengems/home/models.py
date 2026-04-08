@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 
-
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
 
@@ -15,9 +14,14 @@ class Game(models.Model):
     # Full description of the game (story, mechanics, etc.)
     description = models.TextField()
 
-    # The developer who uploaded the game
-    # Linked to Django's built-in User model
-    developer = models.ForeignKey(User, on_delete=models.CASCADE)
+    # Developer name as a string (e.g. "Indie Studio X")
+    developer = models.CharField(max_length=200, blank=True)
+
+    # The user who uploaded the game
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_games', null=True, blank=True)
+
+    # Users authorized to edit this game
+    authorized_users = models.ManyToManyField(User, related_name='authorized_games', blank=True)
 
     # Publisher of the game
     publisher = models.CharField(max_length=200, blank=True)
@@ -50,7 +54,16 @@ class Game(models.Model):
     # Auto-generate slug from title if not provided
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title) or "game"
+            slug = base_slug
+            counter = 1
+
+            while Game.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
     # String representation of the object in admin panel
