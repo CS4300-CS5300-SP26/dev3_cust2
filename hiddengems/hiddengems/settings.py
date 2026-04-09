@@ -161,4 +161,4 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000")
+CSRF_TRUSTED_ORIGINS = {os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000")}
