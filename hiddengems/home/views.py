@@ -57,6 +57,7 @@ def game_detail(request, slug):
         "description": game.description,
         "publisher": game.publisher,
         "developer": game.developer,
+        "game_id" : game.game_id,
     })
 
 
