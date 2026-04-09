@@ -52,7 +52,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r hiddengems/requirements.txt
       
       # Recreates the Production Environment in Django
       - name: Recreate Production Environment
