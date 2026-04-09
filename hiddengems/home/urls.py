@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
 
 # URL patterns for the home app
 urlpatterns = [
@@ -18,4 +21,9 @@ urlpatterns = [
 
     # Game purchase page accessed by game ID
     path('game/<int:game_id>/', views.purchase_game, name='purchase_game'),
+
+    path("admin/", admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
