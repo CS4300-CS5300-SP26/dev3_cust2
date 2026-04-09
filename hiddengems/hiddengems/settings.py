@@ -153,7 +153,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
@@ -172,4 +172,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = ["http://app-bcurtis-21.devedu.io", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = ["https://app-bcurtis-21.devedu.io", "http://localhost:3000"]
