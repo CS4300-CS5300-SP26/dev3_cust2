@@ -33,7 +33,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 os.environ['USE_SQLITE'] = "true"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                    "127.0.0.1,localhost,24.199.106.168,app-jroyer-21.devedu.io,app-bcurtis-21.devedu.io").split(",")
+                    "127.0.0.1,localhost").split(",")
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
@@ -85,20 +85,24 @@ WSGI_APPLICATION = 'hiddengems.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#database
 
-"""
-#commenting out this code to try a different database method temporarily
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hiddengems',
-        'USER': 'admin',
-        'PASSWORD': 'AdminPassword1',
-        'HOST': 'localhost',
-        'PORT': '',
+if os.getenv("DEVELOPMENT_MODE") == "True":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-#Trying this instead:
-"""
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.getenv("DB_NAME", "hiddengems"),
+            'USER': os.getenv("DB_USER", "admin"),
+            'PASSWORD': os.getenv("DB_PASSWORD", ""),
+            'HOST': os.getenv("DB_HOST", "localhost"),
+            'POST': os.getenv("DB_PORT", "")
+        }
+    }
 
 if os.environ.get("USE_SQLITE") == "true":
     DATABASES = {
@@ -123,30 +127,18 @@ else:
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -154,9 +146,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "home/static")]
 
 # Default primary key field type
@@ -169,7 +159,6 @@ MEDIA_URL = "/media/"
 
 # Folder where uploaded files will be stored
 MEDIA_ROOT = BASE_DIR / "media"
-
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = ["http://app-bcurtis-21.devedu.io", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000")
