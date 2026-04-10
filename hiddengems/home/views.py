@@ -45,7 +45,7 @@ def upload_game(request):
 
 
 def browse(request):
-    games = Game.object.all().order_by("-created_at")
+    games = Game.objects.all().order_by("-created_at")
     return render(request, 'home/browse.html', {'games': games})
 
 

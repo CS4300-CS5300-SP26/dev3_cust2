@@ -9,7 +9,7 @@ class Game(models.Model):
     title = models.CharField(max_length=200)
 
     # URL-friendly slug generated from title
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
 
     # Full description of the game (story, mechanics, etc.)
     description = models.TextField()

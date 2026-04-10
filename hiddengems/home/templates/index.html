@@ -110,10 +110,10 @@
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
         <span class="text-light btn-sm">Hi, {{ user.username }}</span>
-        <a href="/upload/" class="btn btn-outline-light btn-sm">Upload a Game</a>
-        <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
+        <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Upload a Game</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
     {% else %}
-        <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
+        <a href="{% url 'signup' %}" class="btn btn-light btn-sm">Sign Up</a>
     {% endif %}
       </div>
     </div>
@@ -179,7 +179,7 @@
       Help others discover amazing indie games by submitting your favorite
       underrated titles.
     </p>
-    <a href="/upload/" class="btn btn-outline-light btn-lg">Submit a Recommendation</a>
+    <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-lg">Submit a Recommendation</a>
   </div>
 </section>
 
