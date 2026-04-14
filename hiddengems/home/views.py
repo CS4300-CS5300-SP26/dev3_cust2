@@ -12,15 +12,16 @@ from .models import Game
 def _ai_parse_query(query):
     # Send the search query to OpenAI and return structured filter parameters
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    response = client.chat.completions.create(
+    response = client.responses.create(
         model="gpt-5.1-codex-mini",
-        messages=[
+        input=[
             {
                 "role": "system",
                 "content": (
                     "You are a game search assistant. Parse the user's natural language search query "
                     "into structured filters for an indie game database.\n\n"
-                    "Return a JSON object with these fields:\n"
+                    "Respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.\n\n"
+                    "JSON fields:\n"
                     "- keywords: list of descriptive words to match against game titles and descriptions. "
                     "Include synonyms and related terms (e.g. 'scary' → ['horror', 'scary', 'spooky', 'terror']). "
                     "Do NOT include the word 'free' or price-related words here — use free_only instead. "
@@ -41,10 +42,16 @@ def _ai_parse_query(query):
                 "content": f"Parse this game search query: {query}",
             },
         ],
-        response_format={"type": "json_object"},
-        max_tokens=300,
     )
-    return json.loads(response.choices[0].message.content)
+    raw = response.output_text
+    print(raw)
+    # Strip markdown code fences if the model wraps output in them
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+    return json.loads(raw)
 
 
 # View that renders the homepage
