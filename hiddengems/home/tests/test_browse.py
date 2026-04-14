@@ -84,5 +84,3 @@ class BrowsePageTests(TestCase):
         )
         response = self.client.get(self.browse_url)
         self.assertContains(response, 'Minimal Game')
- 
-
