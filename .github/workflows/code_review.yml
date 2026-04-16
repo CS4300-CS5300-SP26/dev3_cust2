@@ -80,7 +80,7 @@ jobs:
       
       # Uploads the review artifact to be attached to pull request
       - name: Upload Review Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: review-artifacts
           path: feedback.md
