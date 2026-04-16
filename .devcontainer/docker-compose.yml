@@ -4,4 +4,4 @@ services:
     volumes:
       - .:/workspace
     env_file:
-      - .env_file
+      - .env
