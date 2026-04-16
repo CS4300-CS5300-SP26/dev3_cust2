@@ -13,6 +13,10 @@ updates:
     commit-message:
       prefix: "Pip"
     rebase-strategy: "auto"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -22,4 +26,4 @@ updates:
       day: "monday"
     commit-message:
       prefix: "GitHub Action"
-    rebase-strategy: "disabled"
+    rebase-strategy: "auto"
