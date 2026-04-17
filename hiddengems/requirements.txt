@@ -16,7 +16,6 @@ django-six==1.0.5
 docutils==0.22.4
 excel-base==1.0.4
 gunicorn==25.1.0
-gyp==0.1
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
