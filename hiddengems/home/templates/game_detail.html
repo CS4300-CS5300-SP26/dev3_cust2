@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hidden Gems – Discover Indie Games</title>
+  <title>{{ game.title }} – Hidden Gems</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap 5 -->
@@ -16,12 +16,9 @@
     body {
       font-family: 'Poppins', sans-serif;
       color: #ffffff;
-
-      
-      background: 
+      background:
         linear-gradient(rgba(15, 10, 35, 0.55), rgba(15, 10, 35, 0.65)),
         url("{% static 'home/images/background.webp' %}");
-
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -37,38 +34,63 @@
       letter-spacing: 1px;
     }
 
-    .hero {
-      padding: 120px 0 80px 0;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.7);
-    }
-
-    .hero p {
-      color: #e0e0ff;
-      max-width: 650px;
-      margin: auto;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
-    }
-
-    .feature-card {
+    .game-card {
       background: rgba(26, 26, 46, 0.85);
       border: none;
       border-radius: 15px;
       padding: 30px;
       text-align: center;
-      height: 100%;
       backdrop-filter: blur(6px);
-      transition: transform 0.3s;
+      max-width: 800px;
+      margin: 40px auto;
     }
 
-    .feature-card:hover {
-      transform: translateY(-8px);
+    .game-title {
+      font-size: 2rem;
+      margin: 0 0 16px;
     }
+
+    .game-description {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .game-meta p {
+      margin: 8px 0;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .purchase-card {
+      background: rgba(26, 26, 46, 0.9);
+      padding: 40px 20px;
+      border-radius: 20px;
+      text-align: center;
+      backdrop-filter: blur(6px);
+      max-width: 800px;
+      margin: 20px auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .purchase_button {
+      border: none;
+      color: white;
+      background-color: rgba(89, 89, 157, 0.9);
+      border-radius: 10px;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+
+    .top-text { font-size: 25px; }
+    .bottom-text { font-size: 20px; }
 
     .cta-section {
       background: rgba(26, 26, 46, 0.9);
@@ -87,75 +109,138 @@
       backdrop-filter: blur(6px);
     }
 
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        margin: 0;
-        padding: 20px;
+    /* ── Browser Demo Section ── */
+    .demo-section {
+      max-width: 800px;
+      margin: 20px auto;
     }
 
-    .game-card {
-        background: rgba(26, 26, 46, 0.85);
-        border: none;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        height: 100%;
-        backdrop-filter: blur(6px);
-        max-width: 700px;
-        margin: 40px auto;
+    .demo-section h2 {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      font-weight: 600;
     }
 
-    .game-title {
-        font-size: 2rem;
-        margin: 0 0 16px;
+    /* The wrapper that holds the overlay + iframe together */
+    .game-embed-wrapper {
+      position: relative;
+      width: 100%;
+      /* 16:9 aspect ratio */
+      padding-top: 56.25%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0a0a1a;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
     }
 
-    .game-description {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 20px;
+    /* The click-to-play overlay — shown by default, hidden after click */
+    .game-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 10, 26, 0.88);
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.3s ease;
     }
 
-    .game-meta p {
-        margin: 8px 0;
+    .game-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .label {
-        font-weight: bold;
+    /* Thumbnail behind the play button */
+    .game-overlay-thumb {
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      opacity: 0.35;
     }
 
-    .top-text {
-        font-size: 25px;
+    /* The big play button circle */
+    .play-btn {
+      position: relative;
+      z-index: 2;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+      margin-bottom: 14px;
     }
 
-    .bottom-text {
-        font-size: 20px;
+    .game-overlay:hover .play-btn {
+      transform: scale(1.1);
+      background: rgba(79, 70, 229, 1);
     }
 
-    .purchase-card {
-        background: rgba(26, 26, 46, 0.9);
-        padding: 60px 20px;
-        border-radius: 20px;
-        text-align: center;
-        backdrop-filter: blur(6px);
-        max-width: 700px;
-        margin: 40px auto;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    .play-btn svg {
+      width: 36px;
+      height: 36px;
+      fill: white;
+      margin-left: 5px; /* optical centering of triangle */
     }
 
-    .purchase_button {
-        border: none;
-        color: white;
-        background-color: rgba(89, 89, 157, 0.9);
-        border-radius: 10px;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
+    .overlay-label {
+      position: relative;
+      z-index: 2;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e0e0ff;
+      letter-spacing: 0.05em;
+    }
+
+    /* The actual iframe — sits inside the padded wrapper */
+    #game-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Fullscreen button below the embed */
+    .embed-controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .fullscreen-btn {
+      background: rgba(99, 102, 241, 0.8);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.2s;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(79, 70, 229, 1);
+    }
+
+    .badge-browser {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.8);
+      color: white;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
     }
   </style>
 </head>
@@ -164,57 +249,103 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand" href="#">Hidden Gems</a>
-
+    <a class="navbar-brand" href="/">Hidden Gems</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
-
     <div class="collapse navbar-collapse justify-content-end" id="navMenu">
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
-        <span class="text-light btn-sm">Hi, {{ user.username }}</span>
-        <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
-    {% else %}
-        <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
-    {% endif %}
+          <span class="text-light btn-sm">Hi, {{ user.username }}</span>
+          <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
+        {% else %}
+          <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
+        {% endif %}
       </div>
     </div>
   </div>
 </nav>
 
-<!-- Game Details Display -->
+<!-- Game Info Card -->
 <section class="game-card">
-    <h1 class="game-title">{{ title }}</h1>
+  {% if game.playable_in_browser %}
+    <span class="badge-browser">🎮 Playable in Browser</span>
+  {% endif %}
 
-    <div class="game-description">
-        {{ description }}
-    </div>
+  <h1 class="game-title">{{ game.title }}</h1>
 
-    <div class="game-meta">
-        <p><span class="label">Publisher:</span> {{ publisher }}</p>
-        <p><span class="label">Developer:</span> {{ developer }}</p>
-    </div>
+  {% if game.thumbnail %}
+    <img src="{{ game.thumbnail.url }}" alt="{{ game.title }} thumbnail"
+         style="max-width:100%; border-radius:10px; margin-bottom:20px;">
+  {% endif %}
+
+  <div class="game-description">{{ game.description }}</div>
+
+  <div class="game-meta">
+    {% if game.publisher %}<p><span class="label">Publisher:</span> {{ game.publisher }}</p>{% endif %}
+    <p><span class="label">Developer:</span> {{ game.developer }}</p>
+    {% if game.genre %}<p><span class="label">Genre:</span> {{ game.genre }}</p>{% endif %}
+    {% if game.other_platforms %}<p><span class="label">Also on:</span> {{ game.other_platforms }}</p>{% endif %}
+    <p><span class="label">Price:</span> ${{ game.price }}</p>
+  </div>
 </section>
 
-<!-- Purchase Game Buttons -->
+<!-- ── Browser Demo Embed (only shown if game has a build file and is marked playable) ── -->
+{% if game.playable_in_browser and game.build_file %}
+<section class="demo-section container">
+  <h2>▶ Play Demo in Browser</h2>
+
+  <div class="game-embed-wrapper" id="embed-wrapper">
+
+    <!-- Click-to-play overlay -->
+    <div class="game-overlay" id="game-overlay" onclick="launchGame()">
+      {% if game.thumbnail %}
+        <img class="game-overlay-thumb" src="{{ game.thumbnail.url }}" alt="">
+      {% endif %}
+      <div class="play-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="5,3 19,12 5,21"/>
+        </svg>
+      </div>
+      <span class="overlay-label">Click to Play</span>
+    </div>
+
+    <!-- iframe is src-less until user clicks play — avoids stealing keyboard focus -->
+    <iframe
+      id="game-iframe"
+      title="{{ game.title }} browser demo"
+      allowfullscreen
+      allow="autoplay; fullscreen *; pointer-lock *; midi; clipboard-read; clipboard-write"
+    ></iframe>
+
+  </div>
+
+  <div class="embed-controls">
+    <button class="fullscreen-btn" onclick="goFullscreen()">⛶ Fullscreen</button>
+  </div>
+</section>
+{% endif %}
+
+<!-- Purchase Card -->
 <section class="purchase-card">
-  <!-- controls where the steam link goes-->
-    <a href="https://store.steampowered.com/app/{{ game_id }}" class="purchase_button">
-        <span class="top-text">Purchase</span><br>
-        <span class="bottom-text">{{ price }}</span>
+  {% if game.storefront == "steam" and game.game_id %}
+    <a href="https://store.steampowered.com/app/{{ game.game_id }}" class="purchase_button">
+      <span class="top-text">Purchase on Steam</span><br>
+      <span class="bottom-text">${{ game.price }}</span>
     </a>
+  {% else %}
+    <p style="color:#9ca3af;">Purchase options coming soon.</p>
+  {% endif %}
 </section>
 
-<!-- Call to Action -->
+<!-- CTA -->
 <section class="container my-5">
   <div class="cta-section">
     <h2>Have a Hidden Gem to Share?</h2>
     <p class="text-secondary">
-      Help others discover amazing indie games by submitting your favorite
-      underrated titles.
+      Help others discover amazing indie games by uploading your own title.
     </p>
-    <a href="#" class="btn btn-outline-light btn-lg">Submit a Recommendation</a>
+    <a href="/upload/" class="btn btn-outline-light btn-lg">Upload a Game</a>
   </div>
 </section>
 
@@ -223,5 +354,31 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // The URL of the uploaded build file served by Django media
+  const BUILD_URL = "{{ game.build_file.url }}";
+
+  function launchGame() {
+    const iframe = document.getElementById('game-iframe');
+    const overlay = document.getElementById('game-overlay');
+
+    // Point the iframe at the build — this is what actually starts the game
+    iframe.src = BUILD_URL;
+
+    // Fade out and disable the overlay
+    overlay.classList.add('hidden');
+  }
+
+  function goFullscreen() {
+    const wrapper = document.getElementById('embed-wrapper');
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
+  }
+</script>
+
 </body>
 </html>
