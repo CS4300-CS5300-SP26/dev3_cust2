@@ -3,34 +3,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hidden Gems – Discover Indie Games</title>
+  <title>{{ title }} – Hidden Gems</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg-main: #0f0a23;
+
+      --panel: rgba(26, 26, 46, 0.85);
+      --panel-strong: rgba(26, 26, 46, 0.95);
+
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0ff;
+      --text-muted: #aaa;
+
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --shadow-strong: 0 14px 35px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
       font-family: 'Poppins', sans-serif;
-      color: #ffffff;
-
-      
-      background: 
-        linear-gradient(rgba(15, 10, 35, 0.55), rgba(15, 10, 35, 0.65)),
-        url("{% static 'home/images/background.webp' %}");
-
+      color: #fff;
+      background:
+        linear-gradient(rgba(10, 8, 24, 0.78), rgba(10, 8, 24, 0.88)),
+        url("https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game_id }}/header.jpg");
       background-size: cover;
-      background-position: center;
+      background-position: top center;
       background-attachment: fixed;
       min-height: 100vh;
     }
 
     .navbar {
-      background-color: rgba(20, 20, 40, 0.85);
-      backdrop-filter: blur(6px);
+      background-color: rgba(15, 12, 32, 0.82);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .navbar-brand {
@@ -38,38 +52,119 @@
       letter-spacing: 1px;
     }
 
-    .page-header {
-      padding: 60px 0 30px;
-      text-align: center;
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
     }
 
-    .page-header h1 {
-      font-size: 2.5rem;
+    .game-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 600px;
+      gap: 32px;
+      align-items: start;
+      padding: 24px;
+      background: rgba(10, 8, 24, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .game-main {
+      min-width: 0;
+    }
+
+    .game-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
       font-weight: 700;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.7);
+      margin: 0 0 18px;
     }
 
-    .game-card {
-        background: rgba(26, 26, 46, 0.85);
-        border: none;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        height: 100%;
-        backdrop-filter: blur(6px);
-        max-width: 700px;
-        margin: 40px auto;
+    .game-meta {
+      margin-bottom: 20px;
+      font-size: 1.05rem;
     }
 
-    .game-card .game-title {
-        font-size: 2rem;
-        margin: 0 0 16px;
+    .game-meta p {
+      margin: 0 0 10px;
+      color: var(--text-soft);
     }
 
-    .game-card .game-description {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 20px;
+    .label {
+      color: #fff;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .description-box {
+      background: var(--panel);
+      box-shadow: var(--shadow-soft);
+      border-radius: 18px;
+      padding: 24px;
+      min-height: 260px;
+      color: #f3f0ff;
+      line-height: 1.7;
+    }
+
+    .game-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .cover-frame {
+      width: 100%;
+      max-width: 600px;
+      background: var(--panel);
+      border: none;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .game-cover {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .purchase-button {
+      display: inline-block;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      background: var(--panel-strong);
+      border: none;
+      border-radius: 16px;
+      padding: 18px 24px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .purchase-button:hover {
+      transform: translateY(-2px);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
+    }
+
+    .purchase-button .top-text {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .purchase-button .bottom-text {
+      display: block;
+      margin-top: 6px;
+      font-size: 1rem;
+      color: var(--text-soft);
     }
     
     .similar-game-card {
@@ -84,45 +179,14 @@
       color: #fff;
     }
 
-    .game-meta p {
-        margin: 8px 0;
-    }
-
-    .label {
-        font-weight: bold;
-    }
-
-    .top-text {
-        font-size: 25px;
-    }
-
-    .bottom-text {
-        font-size: 20px;
-    }
-
-    .purchase-card {
-        background: rgba(26, 26, 46, 0.9);
-        padding: 60px 20px;
-        border-radius: 20px;
-        text-align: center;
-        backdrop-filter: blur(6px);
-        max-width: 700px;
-        margin: 40px auto;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    .purchase_button {
-        border: none;
-        color: white;
-        background-color: rgba(89, 89, 157, 0.9);
-        border-radius: 10px;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
+    .similar-game-card:image {
+      display: block;
+      height: 100%;
+      max-height: 150px;
+      width: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 10px;
     }
 
     .empty-state {
@@ -131,22 +195,91 @@
       color: rgba(255,255,255,0.5);
     }
 
+    .future-section {
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 2px dashed rgba(216, 209, 243, 0.35);
+    }
+
+    .future-panel {
+      min-height: 380px;
+      background: rgba(10, 8, 24, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .future-panel h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+
+    .future-panel p {
+      color: var(--text-soft);
+      margin-bottom: 0;
+    }
+
     footer {
-      background: rgba(26, 26, 46, 0.9);
+      background: rgba(15, 12, 32, 0.82);
       color: #aaa;
-      padding: 30px 0;
+      padding: 28px 0;
       text-align: center;
-      margin-top: 50px;
-      backdrop-filter: blur(6px);
+      margin-top: 40px;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 1100px) {
+      .game-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .game-side {
+        align-items: flex-start;
+      }
+
+      .cover-frame,
+      .purchase-button {
+        max-width: 420px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: 24px 14px 40px;
+      }
+
+      .game-hero {
+        padding: 18px;
+        gap: 22px;
+      }
+
+      .description-box {
+        min-height: 0;
+      }
+    }
+
+    /*Hover effects on cards*/
+    .description-box,
+    .cover-frame,
+    .purchase-button {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .description-box:hover,
+    .cover-frame:hover,
+    .purchase-button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand" href="#">Hidden Gems</a>
+    <a class="navbar-brand" href="/">Hidden Gems</a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
@@ -155,79 +288,92 @@
     <div class="collapse navbar-collapse justify-content-end" id="navMenu">
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
-        <span class="text-light btn-sm">Hi, {{ user.username }}</span>
-        <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
-    {% else %}
-        <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
-    {% endif %}
+          <span class="text-light btn-sm">Hi, {{ user.username }}</span>
+          <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
+        {% else %}
+          <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
+        {% endif %}
       </div>
     </div>
   </div>
 </nav>
 
-<!-- Game Details Display -->
-<section class="game-card">
-    <h1 class="game-title">{{ title }}</h1>
+<main class="page-shell">
+  <section class="game-hero">
+    <div class="game-main">
+      <h1 class="game-title">{{ title }}</h1>
 
-    <div class="game-description">
-        {{ description }}
-    </div>
-
-    <div class="game-meta">
-        <p><span class="label">Publisher:</span> {{ publisher }}</p>
+      <div class="game-meta">
         <p><span class="label">Developer:</span> {{ developer }}</p>
-    </div>
-</section>
-
-<!-- Purchase Game Buttons -->
-<section class="purchase-card">
-  <!-- controls where the steam link goes-->
-    <a href="https://store.steampowered.com/app/{{ game_id }}" class="purchase_button">
-        <span class="top-text">Purchase</span><br>
-        <span class="bottom-text">{{ price }}</span>
-    </a>
-</section>
-
-<!-- Similar Games -->
-{% if similar_games %}
-<section class="container my-5">
-  <h2 class="text-center mb-4" style="font-weight: 700;">Similar Games</h2>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-    {% for similar in similar_games %}
-      <div class="col">
-        <a href="{% url 'game_detail' similar.slug %}" style="text-decoration: none; color: #fff;">
-          <div class="game-card similar-game-card" style="margin: 0; text-align: left; padding: 20px;">
-            {% if similar.thumbnail %}
-              <img src="{{ similar.thumbnail.url }}" alt="{{ similar.title }}"
-                   style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 12px;">
-            {% else %}
-              <div style="width: 100%; height: 150px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
-            {% endif %}
-            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">{{ similar.genre|default:"Indie" }}</div>
-            <div style="font-size: 1rem; font-weight: 600; margin: 4px 0;">{{ similar.title }}</div>
-            <div style="font-size: 0.875rem; color: rgba(255,255,255,0.7); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ similar.description }}</div>
-            <div style="font-size: 0.9rem; font-weight: 600; color: #a78bfa; margin-top: 8px;">
-              {% if similar.price == 0 %}Free{% else %}${{ similar.price }}{% endif %}
-            </div>
-          </div>
-        </a>
+        <p><span class="label">Publisher:</span> {{ publisher }}</p>
       </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
 
-<!-- Call to Action -->
-<section class="container my-5">
-  <div class="cta-section">
-    <h2>Have a Hidden Gem to Share?</h2>
-    <p class="text-secondary">
-      Help others discover amazing indie games by submitting your favorite
-      underrated titles.
-    </p>
-    <a href="#" class="btn btn-outline-light btn-lg">Submit a Recommendation</a>
-  </div>
-</section>
+      <div class="description-box">
+        {{ description }}
+      </div>
+    </div>
+
+    <aside class="game-side">
+      <div class="cover-frame">
+        <img
+          src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game_id }}/library_600x900.jpg"
+          alt="{{ title }} cover"
+          class="game-cover"
+        >
+      </div>
+
+      <a href="https://store.steampowered.com/app/{{ game_id }}" class="purchase-button">
+        <span class="top-text">Purchase</span>
+        <span class="bottom-text">{{ price }}</span>
+      </a>
+    </aside>
+  </section>
+
+  <!-- Similar Games -->
+  {% if similar_games %}
+  <section class="container my-5">
+    <h2 class="text-center mb-4" style="font-weight: 700;">Similar Games</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for similar in similar_games %}
+        <div class="col">
+          <a href="{% url 'game_detail' similar.slug %}" style="text-decoration: none; color: #fff;">
+            <div class="game-card similar-game-card" style="margin: 0; text-align: left; padding: 20px;">
+              {% if similar.game_id %}
+                <img
+                  src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ similar.game_id }}/library_600x900.jpg"
+                  alt="{{ similar.title }} cover"
+                  class="similar-game-card:image"
+                  onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
+                >
+
+                <template id="no-image-template">
+                  <div style="width: 100%; height: 150px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
+                </template>
+              {% endif %}
+              <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">{{ similar.genre|default:"Indie" }}</div>
+              <div style="font-size: 1rem; font-weight: 600; margin: 4px 0;">{{ similar.title }}</div>
+              <div style="font-size: 0.875rem; color: rgba(255,255,255,0.7); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ similar.description }}</div>
+              <div style="font-size: 0.9rem; font-weight: 600; color: #a78bfa; margin-top: 8px;">
+                {% if similar.price == 0 %}Free{% else %}${{ similar.price }}{% endif %}
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="future-section">
+    <div class="future-panel">
+      <h2>More features coming here</h2>
+      <p>
+        This section is reserved for future modules like ratings, YouTube videos,
+        and other game-related content.
+      </p>
+    </div>
+  </section>
+</main>
 
 <footer>
   <p>© 2026 Hidden Gems • Built for Indie Game Lovers</p>
