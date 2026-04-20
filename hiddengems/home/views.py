@@ -3,6 +3,7 @@ import os
 
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
 from openai import OpenAI
 
@@ -79,8 +80,12 @@ def upload_game(request):
             # Save the form but don't commit to database yet
             game = form.save(commit=False)
 
-            # Assign the currently logged-in user as the developer
-            game.developer = request.user
+            # Assign the currently logged-in user as the uploader
+            game.uploaded_by = request.user
+
+            # Use username as developer name if not set
+            if not game.developer:
+                game.developer = request.user.username
 
             # Save the game to the database
             game.save()
@@ -152,17 +157,12 @@ def browse(request):
     return render(request, "home/browse.html", {"games": games, "query": query})
 
 
+@xframe_options_sameorigin
 def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
 
     return render(request, "game_detail.html", {
-        "title": game.title,
-        "description": game.description,
-        "publisher": game.publisher,
-        "developer": game.developer,
-        "storefront": game.storefront,
-        "price": game.price,
-        "game_id": game.game_id,
+        "game": game,  # Pass full game object — template accesses all fields via game.field
     })
 
 
