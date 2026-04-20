@@ -27,7 +27,6 @@
       --shadow-strong: 0 14px 35px rgba(0, 0, 0, 0.35);
     }
 
-    
     body {
       font-family: 'Poppins', sans-serif;
       color: #ffffff;
@@ -43,7 +42,7 @@
       */
 
       /* NEW METHOD: fallback color while JS loads the image */
-      background-color: #0f0a23;
+      background-color: var(--bg-main);
       background-size: cover;
       background-position: center;
       background-attachment: scroll;
@@ -71,14 +70,14 @@
     }
 
     .hero p {
-      color: #e0e0ff;
+      color: var(--text-secondary);
       max-width: 650px;
       margin: auto;
       text-shadow: 0 2px 10px rgba(0,0,0,0.7);
     }
 
     .feature-card {
-      background: rgba(26, 26, 46, 0.85);
+      background: var(--panel);
       border: none;
       border-radius: 15px;
       padding: 30px;
@@ -93,7 +92,7 @@
     }
 
     .cta-section {
-      background: rgba(26, 26, 46, 0.9);
+      background: var(--panel-strong);
       padding: 60px 20px;
       border-radius: 20px;
       text-align: center;
@@ -101,7 +100,7 @@
     }
 
     footer {
-      background: rgba(26, 26, 46, 0.9);
+      background: var(--panel-strong);
       color: #aaa;
       padding: 30px 0;
       text-align: center;
