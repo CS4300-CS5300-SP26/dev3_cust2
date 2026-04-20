@@ -64,6 +64,8 @@ jobs:
       # Runs the automated tests
       - name: Run Tests on Django
         id: test-coverage
+        env:
+          DEVELOPMENT_MODE: "True"
         run: |
           cd hiddengems
           coverage run --source='.' manage.py test
