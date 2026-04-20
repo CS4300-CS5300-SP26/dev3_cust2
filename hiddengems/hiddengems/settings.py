@@ -137,7 +137,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
 ]
 
-#Ai code review suggested removing this
+#Ai code review suggested removing this, i had to re-add it to get demos to work
 # Django's default X-Frame-Options is DENY, which blocks iframes loading
 # media files served from the same origin. SAMEORIGIN allows it.
 #X_FRAME_OPTIONS = 'SAMEORIGIN'
+#SECURE_CROSS_ORIGIN_OPENER_POLICY = None
