@@ -69,8 +69,19 @@ def compute_combined_scores(game, all_games, tfidf_scores):
     return results
 
 
-def get_similar_games(game, min_similarity=0.4):
-    """Return up to 6 games similar to the given game."""
+def deduplicate_by_title(scored_games):
+    """Remove duplicate titles, keeping the highest scoring game."""
+    seen_titles = set()
+    deduped = []
+    for g, score in scored_games:
+        if g.title not in seen_titles:
+            seen_titles.add(g.title)
+            deduped.append((g, score))
+    return deduped
+
+
+def get_similar_games(game, min_similarity=0.3):
+    """Return up to 9 games similar to the given game."""
     all_games = list(Game.objects.exclude(pk=game.pk))
 
     if not all_games:
@@ -84,4 +95,6 @@ def get_similar_games(game, min_similarity=0.4):
         if score >= min_similarity
     ]
     similar.sort(key=lambda x: x[1], reverse=True)
-    return [g for g, score in similar[:6]]
+    similar = deduplicate_by_title(similar)
+
+    return [g for g, score in similar[:9]]
