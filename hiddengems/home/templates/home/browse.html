@@ -99,6 +99,16 @@
       background: rgba(15, 10, 35, 0.6);
     }
 
+    .game-card .cover {
+      display: block;
+      height: 100%;
+      max-height: 180px;
+      width: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
     .thumbnail-placeholder {
       width: 100%;
       height: 180px;
@@ -132,6 +142,7 @@
       font-size: 0.875rem;
       color: rgba(255,255,255,0.7);
       display: -webkit-box;
+      line-clamp: 3;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
@@ -191,24 +202,18 @@
   <div class="container">
     <h1>Browse Recommendations</h1>
     <p class="text-secondary">Discover hidden indie gems recommended by the community.</p>
-    {% if query %}
-      <p class="mt-2" style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
-        AI search results for &ldquo;<strong>{{ query }}</strong>&rdquo; &mdash; {{ games|length }} game{{ games|length|pluralize }} found
-      </p>
-    {% endif %}
   </div>
 </section>
 
 <!-- Search Bar -->
 <div class="container">
   <div class="search-bar">
-    <form class="input-group" method="get" action="{% url 'browse' %}">
+    <form class="input-group" method="get" action="#">
       <input
         type="text"
         name="q"
         class="form-control form-control-lg"
         placeholder="Search games by title, genre, or developer..."
-        value="{{ query }}"
       >
       <button class="btn btn-light btn-lg" type="submit">Search</button>
     </form>
@@ -222,11 +227,18 @@
       {% for game in games %}
         <div class="col">
           <a href="{% url 'game_detail' game.slug %}" class="game-card">
-            {% if game.thumbnail %}
-              <img src="{{ game.thumbnail.url }}" alt="{{ game.title }}" class="thumbnail">
-            {% else %}
-              <div class="thumbnail-placeholder">No Image</div>
-            {% endif %}
+            {% if game.game_id %}
+                <img
+                  src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
+                  alt="{{ game.title }} cover"
+                  class="game-card.cover"
+                  onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
+                >
+
+                <template id="no-image-template">
+                  <div style="width: 100%; height: 180px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
+                </template>
+              {% endif %}
             <div class="card-body">
               <div class="game-genre">{{ game.genre|default:"Indie" }}</div>
               <div class="game-title">{{ game.title }}</div>
@@ -241,13 +253,8 @@
     </div>
   {% else %}
     <div class="empty-state">
-      {% if query %}
-        <p class="fs-5">No games matched &ldquo;{{ query }}&rdquo;.</p>
-        <a href="{% url 'browse' %}" class="btn btn-outline-light mt-3">Clear search</a>
-      {% else %}
-        <p class="fs-5">No games have been submitted yet.</p>
-        <a href="{% url 'upload_game' %}" class="btn btn-outline-light mt-3">Be the first to submit one</a>
-      {% endif %}
+      <p class="fs-5">No games have been submitted yet.</p>
+      <a href="{% url 'upload_game' %}" class="btn btn-outline-light mt-3">Be the first to submit one</a>
     </div>
   {% endif %}
 </div>
