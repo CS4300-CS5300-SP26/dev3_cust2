@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from .forms import GameUploadForm
 from .models import Game
 
@@ -53,6 +54,7 @@ def browse(request):
     return render(request, 'home/browse.html', {'games': games})
 
 
+@xframe_options_sameorigin
 def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
 
