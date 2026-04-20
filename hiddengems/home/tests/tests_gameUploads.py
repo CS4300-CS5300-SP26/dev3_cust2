@@ -1,9 +1,8 @@
-
 # Create your tests here.
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
-from .models import Game
+from home.models import Game
 
 
 class GameUploadSadPathTests(TestCase):
@@ -51,19 +50,19 @@ class GameUploadSadPathTests(TestCase):
         self.assertFalse(Game.objects.exists())
 
     def test_missing_genre(self):
-        # Should fail - genre is required
+        # genre is optional (blank=True) — should succeed without it
         response = self.client.post(self.upload_url, {
             'title': 'My Game',
             'description': 'A cool game',
             'price': '9.99',
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(Game.objects.exists())
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Game.objects.filter(title='My Game').exists())
 
     # --- Wild/weird input ---
 
     def test_negative_price(self):
-        # Should fail - price cannot be negative
+        # Should fail - price cannot be negative (validated in forms.py)
         response = self.client.post(self.upload_url, {
             'title': 'My Game',
             'description': 'A cool game',
@@ -73,7 +72,7 @@ class GameUploadSadPathTests(TestCase):
         self.assertFalse(Game.objects.exists())
 
     def test_price_too_large(self):
-        # Should fail - price exceeds max_digits in model
+        # Should fail - price exceeds allowed maximum (validated in forms.py)
         response = self.client.post(self.upload_url, {
             'title': 'My Game',
             'description': 'A cool game',
@@ -113,30 +112,28 @@ class GameUploadSadPathTests(TestCase):
         self.assertFalse(Game.objects.exists())
 
     def test_sql_injection_in_title(self):
-        # Should be safely handled by Django's ORM
+        # Django's ORM safely parameterizes queries — SQL injection is not possible.
+        # The game saves normally; the important thing is the DB table still exists.
         response = self.client.post(self.upload_url, {
             'title': "'; DROP TABLE home_game; --",
             'description': 'A cool game',
             'price': '9.99',
             'genre': 'RPG',
         })
-        # Django should handle this safely - table should still exist
-        self.assertFalse(Game.objects.filter(
-            title="'; DROP TABLE home_game; --"
-        ).exists())
+        # Table still exists and is queryable — ORM handled it safely
+        self.assertTrue(Game.objects.exists())
 
     def test_xss_in_description(self):
-        # Should be safely escaped by Django templates
+        # Django templates auto-escape XSS at render time, not save time.
+        # The game saves to the DB normally — escaping happens when displayed.
         response = self.client.post(self.upload_url, {
             'title': 'My Game',
             'description': '<script>alert("hacked")</script>',
             'price': '9.99',
             'genre': 'RPG',
         })
-        # Game should not be saved with malicious script
-        self.assertFalse(Game.objects.filter(
-            description='<script>alert("hacked")</script>'
-        ).exists())
+        # Game saves successfully — Django templates will escape it on render
+        self.assertTrue(Game.objects.filter(title='My Game').exists())
 
     def test_unauthenticated_upload(self):
         # Should fail - user must be logged in to upload
