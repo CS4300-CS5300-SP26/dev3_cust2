@@ -34,7 +34,7 @@
       color: #fff;
       background:
         linear-gradient(rgba(10, 8, 24, 0.78), rgba(10, 8, 24, 0.88)),
-        url("https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game_id }}/header.jpg");
+        url("https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.game_id }}/header.jpg");
       background-size: cover;
       background-position: top center;
       background-attachment: fixed;
@@ -300,30 +300,30 @@
 <main class="page-shell">
   <section class="game-hero">
     <div class="game-main">
-      <h1 class="game-title">{{ title }}</h1>
+      <h1 class="game-title">{{ game.title }}</h1>
 
       <div class="game-meta">
-        <p><span class="label">Developer:</span> {{ developer }}</p>
-        <p><span class="label">Publisher:</span> {{ publisher }}</p>
+        <p><span class="label">Developer:</span> {{ game.developer }}</p>
+        <p><span class="label">Publisher:</span> {{ game.publisher }}</p>
       </div>
 
       <div class="description-box">
-        {{ description }}
+        {{ game.description }}
       </div>
     </div>
 
     <aside class="game-side">
       <div class="cover-frame">
         <img
-          src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game_id }}/library_600x900.jpg"
-          alt="{{ title }} cover"
+          src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
+          alt="{{ game.title }} cover"
           class="game-cover"
         >
       </div>
 
-      <a href="https://store.steampowered.com/app/{{ game_id }}" class="purchase-button">
+      <a href="https://store.steampowered.com/app/{{ game.game_id }}" class="purchase-button">
         <span class="top-text">Purchase</span>
-        <span class="bottom-text">{{ price }}</span>
+        <span class="bottom-text">{{ game.price }}</span>
       </a>
     </aside>
   </section>
