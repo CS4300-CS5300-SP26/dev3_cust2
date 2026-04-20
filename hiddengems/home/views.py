@@ -3,6 +3,7 @@ import os
 
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_GET
 from openai import OpenAI
 
 from .forms import GameUploadForm
@@ -95,6 +96,7 @@ def upload_game(request):
     return render(request, "home/upload_game.html", {"form": form})
 
 
+@require_GET
 def browse(request):
     query = request.GET.get("q", "").strip()
     games = Game.objects.all().order_by("-created_at")
