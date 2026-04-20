@@ -305,6 +305,7 @@
       <div class="game-meta">
         <p><span class="label">Developer:</span> {{ game.developer }}</p>
         <p><span class="label">Publisher:</span> {{ game.publisher }}</p>
+        {% if game.playable_in_browser %}<p><span class="badge">Playable in Browser</span></p>{% endif %}
       </div>
 
       <div class="description-box">

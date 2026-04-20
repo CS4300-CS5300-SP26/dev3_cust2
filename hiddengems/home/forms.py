@@ -8,7 +8,7 @@ from .models import Game
 # ModelForm automatically creates fields based on the Game model
 class GameUploadForm(forms.ModelForm):
 
-    genre = forms.CharField(max_length=100, required=True)
+    genre = forms.CharField(max_length=100, required=False)
     price = forms.DecimalField(
         max_digits=10,
         decimal_places=2,

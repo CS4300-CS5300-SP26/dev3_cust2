@@ -75,7 +75,7 @@ class BrowsePageTests(TestCase):
     def test_browse_post_request_not_allowed(self):
         # Browse page should not accept POST requests
         response = self.client.post(self.browse_url, {})
-        self.assertEqual(response.status_code, 200) 
+        self.assertEqual(response.status_code, 405)
     
     def test_browse_game_with_missing_optional_fields(self):
         # Game with only required fields should still appear on browse page
