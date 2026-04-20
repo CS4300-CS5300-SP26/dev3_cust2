@@ -132,6 +132,7 @@ LOGIN_URL = '/'
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
 # ── ADD THESE LINES to the bottom of your existing settings.py ──
 
+#Ai code review suggested removing this
 # Django's default X-Frame-Options is DENY, which blocks iframes loading
 # media files served from the same origin. SAMEORIGIN allows it.
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+#X_FRAME_OPTIONS = 'SAMEORIGIN'

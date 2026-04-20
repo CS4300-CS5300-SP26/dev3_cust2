@@ -295,7 +295,7 @@
 <section class="demo-section container">
   <h2>▶ Play Demo in Browser</h2>
 
-  <div class="game-embed-wrapper" id="embed-wrapper">
+  <div class="game-embed-wrapper" id="embed-wrapper" {% if game.build_file %}data-build-url="{{ game.build_file.url|escapejs }}"{% endif %}>
 
     <!-- Click-to-play overlay -->
     <div class="game-overlay" id="game-overlay" onclick="launchGame()">
@@ -356,15 +356,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // The URL of the uploaded build file served by Django media
-  const BUILD_URL = "{{ game.build_file.url }}";
-
   function launchGame() {
     const iframe = document.getElementById('game-iframe');
     const overlay = document.getElementById('game-overlay');
+    const wrapper = document.getElementById('embed-wrapper');
+
+    // Read the build URL safely from a data attribute — avoids raw template injection into JS
+    const buildUrl = wrapper ? wrapper.dataset.buildUrl : null;
+    if (!buildUrl) return;
 
     // Point the iframe at the build — this is what actually starts the game
-    iframe.src = BUILD_URL;
+    iframe.src = buildUrl;
 
     // Fade out and disable the overlay
     overlay.classList.add('hidden');
@@ -372,6 +374,7 @@
 
   function goFullscreen() {
     const wrapper = document.getElementById('embed-wrapper');
+    if (!wrapper) return;
     if (wrapper.requestFullscreen) {
       wrapper.requestFullscreen();
     } else if (wrapper.webkitRequestFullscreen) {

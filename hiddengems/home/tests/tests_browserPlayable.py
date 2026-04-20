@@ -2,8 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .models import Game
-
+from home.models import Game
 
 class BrowserPlayableGameTests(TestCase):
 
