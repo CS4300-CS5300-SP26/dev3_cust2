@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import GameUploadForm
 from .models import Game
+from .utils import get_similar_games
 
 
 # View that renders the homepage
 def index(request):
     return render(request, 'index.html')
-
 
 # View that handles the game upload page
 def upload_game(request):
@@ -51,6 +51,7 @@ def browse(request):
 
 def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
+    similar_games = get_similar_games(game)
 
     return render(request, "game_detail.html", {
         "title": game.title,
@@ -60,6 +61,7 @@ def game_detail(request, slug):
         "storefront": game.storefront,
         "price": game.price,
         "game_id": game.game_id,
+        "similar_games": similar_games,
     })
 
 
