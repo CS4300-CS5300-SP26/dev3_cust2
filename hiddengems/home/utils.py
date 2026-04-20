@@ -1,7 +1,8 @@
+import re
+from django.core.cache import cache
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from .models import Game
-import re
+from .models import Game, SimilarGame
 
 
 def game_to_text(game):
@@ -80,7 +81,7 @@ def deduplicate_by_title(scored_games):
     return deduped
 
 
-def get_similar_games(game, min_similarity=0.3):
+def compute_similar_games(game, min_similarity=0.3):
     """Return up to 9 games similar to the given game."""
     all_games = list(Game.objects.exclude(pk=game.pk))
 
@@ -97,4 +98,43 @@ def get_similar_games(game, min_similarity=0.3):
     similar.sort(key=lambda x: x[1], reverse=True)
     similar = deduplicate_by_title(similar)
 
-    return [g for g, score in similar[:9]]
+    return similar[:9]
+
+def store_similar_games(game, scored_games):
+    """Persist similar games to the database."""
+    SimilarGame.objects.filter(game=game).delete()
+    SimilarGame.objects.bulk_create([
+        SimilarGame(game=game, similar=g, score=score)
+        for g, score in scored_games
+    ])
+
+
+def get_similar_games(game):
+    """
+    Return up to 9 similar games using memory cache, then DB, then compute.
+    Cache is per-game and expires after 1 hour.
+    """
+    cache_key = f"similar_games_{game.pk}"
+
+    # 1. Check memory cache
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # 2. Check database
+    db_results = list(
+        SimilarGame.objects.filter(game=game)
+        .select_related('similar')
+        .order_by('-score')[:9]
+    )
+    if db_results:
+        similar = [entry.similar for entry in db_results]
+        cache.set(cache_key, similar, timeout=3600)
+        return similar
+
+    # 3. Compute fresh
+    scored_games = compute_similar_games(game)
+    store_similar_games(game, scored_games)
+    similar = [g for g, score in scored_games]
+    cache.set(cache_key, similar, timeout=3600)
+    return similar

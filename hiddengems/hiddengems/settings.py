@@ -130,3 +130,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_URL = '/'
 
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
