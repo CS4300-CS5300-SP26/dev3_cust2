@@ -17,7 +17,7 @@ on:
   push:
     branches: [ '**' ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "dev", "main" ]
 
 # Sets the permissions for the GITHUB_TOKEN
 permissions:
@@ -42,9 +42,9 @@ jobs:
       # Installs Python with latest architecture
       # Last updated March 17, 2026
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.14.3
+          python-version: 3.12.3
           architecture: x64
           cache: 'pip'  # Caches pip dependencies
       
@@ -64,6 +64,8 @@ jobs:
       # Runs the automated tests
       - name: Run Tests on Django
         id: test-coverage
+        env:
+          DEVELOPMENT_MODE: "True"
         run: |
           cd hiddengems
           coverage run --source='.' manage.py test
@@ -77,13 +79,19 @@ jobs:
           path: coverage.txt
 
       # Comments the coverage on the pull request
+      - name: Read Coverage Output
+        if: github.event_name == 'pull_request'
+        id: coverage-output
+        run: echo "content<<EOF" >> $GITHUB_OUTPUT && cat coverage.txt >> $GITHUB_OUTPUT && echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Comment Coverage Results
+        if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
             ## Coverage.yml Results
             ```
-            {{ cat coverage.txt }}
+            ${{ steps.coverage-output.outputs.content }}
             ```
 
       # Runs cleanup on created files

@@ -191,18 +191,24 @@
   <div class="container">
     <h1>Browse Recommendations</h1>
     <p class="text-secondary">Discover hidden indie gems recommended by the community.</p>
+    {% if query %}
+      <p class="mt-2" style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+        AI search results for &ldquo;<strong>{{ query }}</strong>&rdquo; &mdash; {{ games|length }} game{{ games|length|pluralize }} found
+      </p>
+    {% endif %}
   </div>
 </section>
 
 <!-- Search Bar -->
 <div class="container">
   <div class="search-bar">
-    <form class="input-group" method="get" action="#">
+    <form class="input-group" method="get" action="{% url 'browse' %}">
       <input
         type="text"
         name="q"
         class="form-control form-control-lg"
         placeholder="Search games by title, genre, or developer..."
+        value="{{ query }}"
       >
       <button class="btn btn-light btn-lg" type="submit">Search</button>
     </form>
@@ -235,8 +241,13 @@
     </div>
   {% else %}
     <div class="empty-state">
-      <p class="fs-5">No games have been submitted yet.</p>
-      <a href="{% url 'upload_game' %}" class="btn btn-outline-light mt-3">Be the first to submit one</a>
+      {% if query %}
+        <p class="fs-5">No games matched &ldquo;{{ query }}&rdquo;.</p>
+        <a href="{% url 'browse' %}" class="btn btn-outline-light mt-3">Clear search</a>
+      {% else %}
+        <p class="fs-5">No games have been submitted yet.</p>
+        <a href="{% url 'upload_game' %}" class="btn btn-outline-light mt-3">Be the first to submit one</a>
+      {% endif %}
     </div>
   {% endif %}
 </div>
