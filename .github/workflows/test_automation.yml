@@ -79,6 +79,11 @@ jobs:
           path: coverage.txt
 
       # Comments the coverage on the pull request
+      - name: Read Coverage Output
+        if: github.event_name == 'pull_request'
+        id: coverage-output
+        run: echo "content<<EOF" >> $GITHUB_OUTPUT && cat coverage.txt >> $GITHUB_OUTPUT && echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Comment Coverage Results
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
@@ -86,7 +91,7 @@ jobs:
           message: |
             ## Coverage.yml Results
             ```
-            {{ cat coverage.txt }}
+            ${{ steps.coverage-output.outputs.content }}
             ```
 
       # Runs cleanup on created files
