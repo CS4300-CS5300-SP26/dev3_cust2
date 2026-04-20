@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ title }} – Hidden Gems</title>
+  <title>{{ game.title }} – Hidden Gems</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -284,7 +284,6 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
-
     <div class="collapse navbar-collapse justify-content-end" id="navMenu">
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
@@ -374,11 +373,122 @@
     </div>
   </section>
 </main>
+<!-- Game Info Card -->
+<section class="game-card">
+  {% if game.playable_in_browser %}
+    <span class="badge-browser">🎮 Playable in Browser</span>
+  {% endif %}
+
+  <h1 class="game-title">{{ game.title }}</h1>
+
+  {% if game.thumbnail %}
+    <img src="{{ game.thumbnail.url }}" alt="{{ game.title }} thumbnail"
+         style="max-width:100%; border-radius:10px; margin-bottom:20px;">
+  {% endif %}
+
+  <div class="game-description">{{ game.description }}</div>
+
+  <div class="game-meta">
+    {% if game.publisher %}<p><span class="label">Publisher:</span> {{ game.publisher }}</p>{% endif %}
+    <p><span class="label">Developer:</span> {{ game.developer }}</p>
+    {% if game.genre %}<p><span class="label">Genre:</span> {{ game.genre }}</p>{% endif %}
+    {% if game.other_platforms %}<p><span class="label">Also on:</span> {{ game.other_platforms }}</p>{% endif %}
+    <p><span class="label">Price:</span> ${{ game.price }}</p>
+  </div>
+</section>
+
+<!-- ── Browser Demo Embed (only shown if game has a build file and is marked playable) ── -->
+{% if game.playable_in_browser and game.build_file %}
+<section class="demo-section container">
+  <h2>▶ Play Demo in Browser</h2>
+
+  <div class="game-embed-wrapper" id="embed-wrapper" {% if game.build_file %}data-build-url="{{ game.build_file.url|escapejs }}"{% endif %}>
+
+    <!-- Click-to-play overlay -->
+    <div class="game-overlay" id="game-overlay" onclick="launchGame()">
+      {% if game.thumbnail %}
+        <img class="game-overlay-thumb" src="{{ game.thumbnail.url }}" alt="">
+      {% endif %}
+      <div class="play-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="5,3 19,12 5,21"/>
+        </svg>
+      </div>
+      <span class="overlay-label">Click to Play</span>
+    </div>
+
+    <!-- iframe is src-less until user clicks play — avoids stealing keyboard focus -->
+    <iframe
+      id="game-iframe"
+      title="{{ game.title }} browser demo"
+      allowfullscreen
+      allow="autoplay; fullscreen *; pointer-lock *; midi; clipboard-read; clipboard-write"
+    ></iframe>
+
+  </div>
+
+  <div class="embed-controls">
+    <button class="fullscreen-btn" onclick="goFullscreen()">⛶ Fullscreen</button>
+  </div>
+</section>
+{% endif %}
+
+<!-- Purchase Card -->
+<section class="purchase-card">
+  {% if game.storefront == "steam" and game.game_id %}
+    <a href="https://store.steampowered.com/app/{{ game.game_id }}" class="purchase_button">
+      <span class="top-text">Purchase on Steam</span><br>
+      <span class="bottom-text">${{ game.price }}</span>
+    </a>
+  {% else %}
+    <p style="color:#9ca3af;">Purchase options coming soon.</p>
+  {% endif %}
+</section>
+
+<!-- CTA -->
+<section class="container my-5">
+  <div class="cta-section">
+    <h2>Have a Hidden Gem to Share?</h2>
+    <p class="text-secondary">
+      Help others discover amazing indie games by uploading your own title.
+    </p>
+    <a href="/upload/" class="btn btn-outline-light btn-lg">Upload a Game</a>
+  </div>
+</section>
 
 <footer>
   <p>© 2026 Hidden Gems • Built for Indie Game Lovers</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function launchGame() {
+    const iframe = document.getElementById('game-iframe');
+    const overlay = document.getElementById('game-overlay');
+    const wrapper = document.getElementById('embed-wrapper');
+
+    // Read the build URL safely from a data attribute — avoids raw template injection into JS
+    const buildUrl = wrapper ? wrapper.dataset.buildUrl : null;
+    if (!buildUrl) return;
+
+    // Point the iframe at the build — this is what actually starts the game
+    iframe.src = buildUrl;
+
+    // Fade out and disable the overlay
+    overlay.classList.add('hidden');
+  }
+
+  function goFullscreen() {
+    const wrapper = document.getElementById('embed-wrapper');
+    if (!wrapper) return;
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
+  }
+</script>
+
 </body>
 </html>
