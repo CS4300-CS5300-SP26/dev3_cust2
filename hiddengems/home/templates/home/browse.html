@@ -99,11 +99,9 @@
       background: rgba(15, 10, 35, 0.6);
     }
 
-    .game-card .cover {
+    .game-card-cover {
       display: block;
-      height: 100%;
-      max-height: 180px;
-      width: auto;
+      width: 100%;
       aspect-ratio: 2 / 3;
       object-fit: cover;
       border-radius: 10px;
@@ -232,7 +230,7 @@
                 <img
                   src="{{ game.thumbnail.url }}"
                   alt="{{ game.title }} cover"
-                  class="game-cover"
+                  class="game-card-cover"
                   onerror="this.style.display='none'"
                 >
 
@@ -240,7 +238,7 @@
                 <img
                   src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
                   alt="{{ game.title }} cover"
-                  class="game-card.cover"
+                  class="game-card-cover"
                   onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
                 >
 
