@@ -42,7 +42,7 @@ jobs:
       # Installs Python with latest architecture
       # Last updated March 17, 2026
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.12.3
           architecture: x64
@@ -73,7 +73,7 @@ jobs:
 
       # Uploads the output from Test Coverage
       - name: Upload Coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-results
           path: coverage.txt
