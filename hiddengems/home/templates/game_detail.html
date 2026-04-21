@@ -410,7 +410,16 @@
         <div class="col">
           <a href="{% url 'game_detail' similar.slug %}" style="text-decoration: none; color: #fff;">
             <div class="similar-game-card" style="background: rgba(26,26,46,0.85); border-radius: 15px; padding: 20px; backdrop-filter: blur(6px);">
-              {% if similar.game_id %}
+              
+              {% if similar.thumbnail %}
+                <img
+                  src="{{ similar.thumbnail.url }}"
+                  alt="{{ similar.title }} cover"
+                  style="width:100%; aspect-ratio: 2/3; object-fit:cover;border-radius:10px;margin-bottom:12px;"
+                  onerror="this.style.display='none'"
+                >
+
+              {% elif similar.game_id %}
                 <img
                   src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ similar.game_id }}/library_600x900.jpg"
                   alt="{{ similar.title }} cover"

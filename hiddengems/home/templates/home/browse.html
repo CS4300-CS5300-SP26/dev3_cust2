@@ -227,7 +227,16 @@
       {% for game in games %}
         <div class="col">
           <a href="{% url 'game_detail' game.slug %}" class="game-card">
-            {% if game.game_id %}
+            
+              {% if game.thumbnail %}
+                <img
+                  src="{{ game.thumbnail.url }}"
+                  alt="{{ game.title }} cover"
+                  class="game-cover"
+                  onerror="this.style.display='none'"
+                >
+
+              {% elif game.game_id %}
                 <img
                   src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
                   alt="{{ game.title }} cover"
