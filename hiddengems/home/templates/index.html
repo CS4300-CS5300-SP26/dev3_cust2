@@ -127,6 +127,7 @@
         <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Upload a Game</a>
         <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
     {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>
         <a href="{% url 'signup' %}" class="btn btn-light btn-sm">Sign Up</a>
     {% endif %}
       </div>

@@ -65,9 +65,9 @@ def index(request):
 # View that handles the game upload page
 def upload_game(request):
 
-    # Redirect unauthenticated users to homepage
+    # Redirect unauthenticated users to login page, then back to upload after login
     if not request.user.is_authenticated:
-        return redirect('index')
+        return redirect(f"/accounts/login/?next=/upload/")
 
     # If the form was submitted
     if request.method == "POST":
