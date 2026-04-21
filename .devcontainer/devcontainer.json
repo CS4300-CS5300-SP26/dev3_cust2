@@ -3,7 +3,7 @@
   "image": "deveduio/django:latest",
 
   "runArgs": [
-    "--env-file", ".env"
+    "--env-file", "hiddengems/.env"
   ],
 
   "forwardPorts": [80, 3000],

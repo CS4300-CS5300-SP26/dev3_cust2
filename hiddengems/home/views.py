@@ -9,6 +9,7 @@ from openai import OpenAI
 
 from .forms import GameUploadForm
 from .models import Game
+from .utils import get_similar_games
 
 
 def _ai_parse_query(query):
@@ -160,9 +161,11 @@ def browse(request):
 @xframe_options_sameorigin
 def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
+    similar_games = get_similar_games(game)
 
     return render(request, "game_detail.html", {
         "game": game,  # Pass full game object — template accesses all fields via game.field
+        "similar_games": similar_games,
     })
 
 

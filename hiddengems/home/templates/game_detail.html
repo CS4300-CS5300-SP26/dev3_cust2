@@ -17,11 +17,22 @@
       --text-primary: #ffffff;
       --text-secondary: #e0e0ff;
       --text-muted: #aaa;
+
+      --panel: rgba(26, 26, 46, 0.85);
+      --panel-strong: rgba(26, 26, 46, 0.95);
+
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0ff;
+      --text-muted: #aaa;
+
       --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.25);
       --shadow-strong: 0 14px 35px rgba(0, 0, 0, 0.35);
     }
 
     * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -187,12 +198,14 @@
     .future-panel h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.5rem; }
     .future-panel p { color: var(--text-muted); margin-bottom: 0; }
 
-    .cta-section {
-      background: rgba(26, 26, 46, 0.9);
-      padding: 60px 20px;
-      border-radius: 20px;
-      text-align: center;
-      backdrop-filter: blur(6px);
+    .game-cover {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 12px;
     }
 
     footer {
@@ -211,11 +224,10 @@
       border-top: 2px dashed rgba(216, 209, 243, 0.35);
     }
 
-    .demo-section h2 {
-      text-align: center;
-      margin-bottom: 16px;
-      font-size: 1.4rem;
-      font-weight: 600;
+    .purchase-button .top-text {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 700;
     }
 
     .game-embed-wrapper {
@@ -239,11 +251,23 @@
       cursor: pointer;
       z-index: 10;
       transition: opacity 0.3s ease;
+    .purchase-button .bottom-text {
+      display: block;
+      margin-top: 6px;
+      font-size: 1rem;
+      color: var(--text-soft);
+    }
+    
+    .similar-game-card {
+        max-width: 100%;
+        margin: 0;
+        transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .game-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
+    .similar-game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      color: #fff;
     }
 
     .game-overlay-thumb {
@@ -251,8 +275,14 @@
       inset: 0;
       object-fit: cover;
       width: 100%;
+    .similar-game-card:image {
+      display: block;
       height: 100%;
-      opacity: 0.35;
+      max-height: 150px;
+      width: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 10px;
     }
 
     .play-btn {
@@ -267,11 +297,16 @@
       justify-content: center;
       transition: transform 0.2s, background 0.2s;
       margin-bottom: 14px;
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: rgba(255,255,255,0.5);
     }
 
-    .game-overlay:hover .play-btn {
-      transform: scale(1.1);
-      background: rgba(79, 70, 229, 1);
+    .future-section {
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 2px dashed rgba(216, 209, 243, 0.35);
     }
 
     .play-btn svg {
@@ -281,13 +316,10 @@
       margin-left: 5px;
     }
 
-    .overlay-label {
-      position: relative;
-      z-index: 2;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e0e0ff;
-      letter-spacing: 0.05em;
+    .future-panel h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
     }
 
     #game-iframe {
@@ -302,18 +334,33 @@
       display: flex;
       justify-content: flex-end;
       margin-top: 10px;
+    .future-panel p {
+      color: var(--text-soft);
+      margin-bottom: 0;
     }
 
-    .fullscreen-btn {
-      background: rgba(99, 102, 241, 0.8);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      transition: background 0.2s;
+    footer {
+      background: rgba(15, 12, 32, 0.82);
+      color: #aaa;
+      padding: 28px 0;
+      text-align: center;
+      margin-top: 40px;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 1100px) {
+      .game-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .game-side {
+        align-items: flex-start;
+      }
+
+      .cover-frame,
+      .purchase-button {
+        max-width: 420px;
+      }
     }
 
     .fullscreen-btn:hover { background: rgba(79, 70, 229, 1); }
@@ -340,6 +387,33 @@
       .page-shell { padding: 24px 14px 40px; }
       .game-hero { padding: 18px; gap: 22px; }
       .description-box { min-height: 0; }
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: 24px 14px 40px;
+      }
+
+      .game-hero {
+        padding: 18px;
+        gap: 22px;
+      }
+
+      .description-box {
+        min-height: 0;
+      }
+    }
+
+    /*Hover effects on cards*/
+    .description-box,
+    .cover-frame,
+    .purchase-button {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .description-box:hover,
+    .cover-frame:hover,
+    .purchase-button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
@@ -348,6 +422,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
     <a class="navbar-brand" href="/">Hidden Gems</a>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -478,6 +553,102 @@
 
     <div class="embed-controls">
       <button class="fullscreen-btn" onclick="goFullscreen()">&#9974; Fullscreen</button>
+      <h1 class="game-title">{{ game.title }}</h1>
+
+      <div class="game-meta">
+        <p><span class="label">Developer:</span> {{ game.developer }}</p>
+        <p><span class="label">Publisher:</span> {{ game.publisher }}</p>
+        {% if game.playable_in_browser %}<p><span class="badge">Playable in Browser</span></p>{% endif %}
+      </div>
+
+      <div class="description-box">
+        {{ game.description }}
+      </div>
+    </div>
+
+    <aside class="game-side">
+      <div class="cover-frame">
+        <img
+          src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
+          alt="{{ game.title }} cover"
+          class="game-cover"
+        >
+      </div>
+
+      <a href="https://store.steampowered.com/app/{{ game.game_id }}" class="purchase-button">
+        <span class="top-text">Purchase</span>
+        <span class="bottom-text">{{ game.price }}</span>
+      </a>
+    </aside>
+  </section>
+
+  <!-- Similar Games -->
+  {% if similar_games %}
+  <section class="container my-5">
+    <h2 class="text-center mb-4" style="font-weight: 700;">Similar Games</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for similar in similar_games %}
+        <div class="col">
+          <a href="{% url 'game_detail' similar.slug %}" style="text-decoration: none; color: #fff;">
+            <div class="game-card similar-game-card" style="margin: 0; text-align: left; padding: 20px;">
+              {% if similar.game_id %}
+                <img
+                  src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ similar.game_id }}/library_600x900.jpg"
+                  alt="{{ similar.title }} cover"
+                  class="similar-game-card:image"
+                  onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
+                >
+
+                <template id="no-image-template">
+                  <div style="width: 100%; height: 150px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
+                </template>
+              {% endif %}
+              <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">{{ similar.genre|default:"Indie" }}</div>
+              <div style="font-size: 1rem; font-weight: 600; margin: 4px 0;">{{ similar.title }}</div>
+              <div style="font-size: 0.875rem; color: rgba(255,255,255,0.7); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ similar.description }}</div>
+              <div style="font-size: 0.9rem; font-weight: 600; color: #a78bfa; margin-top: 8px;">
+                {% if similar.price == 0 %}Free{% else %}${{ similar.price }}{% endif %}
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ── Browser Demo Embed (only shown if game has a build file and is marked playable) ── -->
+  {% if game.playable_in_browser and game.build_file %}
+  <section class="demo-section container">
+    <h2>▶ Play Demo in Browser</h2>
+
+    <div class="game-embed-wrapper" id="embed-wrapper" {% if game.build_file %}data-build-url="{{ game.build_file.url|escapejs }}"{% endif %}>
+
+      <!-- Click-to-play overlay -->
+      <div class="game-overlay" id="game-overlay" onclick="launchGame()">
+        {% if game.thumbnail %}
+          <img class="game-overlay-thumb" src="{{ game.thumbnail.url }}" alt="">
+        {% endif %}
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="5,3 19,12 5,21"/>
+          </svg>
+        </div>
+        <span class="overlay-label">Click to Play</span>
+      </div>
+
+      <!-- iframe is src-less until user clicks play — avoids stealing keyboard focus -->
+      <iframe
+        id="game-iframe"
+        title="{{ game.title }} browser demo"
+        allowfullscreen
+        allow="autoplay; fullscreen *; pointer-lock *; midi; clipboard-read; clipboard-write"
+      ></iframe>
+
+    </div>
+
+    <div class="embed-controls">
+      <button class="fullscreen-btn" onclick="goFullscreen()">⛶ Fullscreen</button>
     </div>
   </section>
   {% endif %}
@@ -486,6 +657,10 @@
     <div class="future-panel">
       <h2>More features coming here</h2>
       <p>This section is reserved for future modules like ratings, YouTube videos, and other game-related content.</p>
+      <p>
+        This section is reserved for future modules like ratings, YouTube videos,
+        and other game-related content.
+      </p>
     </div>
   </section>
 </main>

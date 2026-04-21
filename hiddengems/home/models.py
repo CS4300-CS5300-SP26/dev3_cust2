@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.core.cache import cache
 
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
@@ -69,3 +71,21 @@ class Game(models.Model):
     # String representation of the object in admin panel
     def __str__(self):
         return self.title
+
+@receiver(models.signals.post_save, sender=Game)
+def invalidate_similar_games_cache(sender, instance, **kwargs):
+    cache.delete(f"similar_games_{instance.pk}")
+    SimilarGame.objects.filter(game=instance).delete()
+
+class SimilarGame(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='similar_games')
+    similar = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='similar_to')
+    score = models.FloatField()
+    computed_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-score']
+        unique_together = [['game', 'similar']]
+
+    def __str__(self):
+        return f"{self.game.title} -> {self.similar.title} ({self.score:.2f})"
