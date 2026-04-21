@@ -73,6 +73,18 @@
       border-radius: 0 10px 10px 0;
     }
 
+    .badge-browser {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.8);
+      color: white;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
     .game-card {
       background: rgba(26, 26, 46, 0.85);
       border: none;
@@ -247,9 +259,14 @@
                 </template>
               {% endif %}
             <div class="card-body">
+              {% if game.playable_in_browser %}
+                <span class="badge-browser">&#127918; Playable in Browser</span>
+              {% endif %}
+              
               <div class="game-genre">{{ game.genre|default:"Indie" }}</div>
               <div class="game-title">{{ game.title }}</div>
               <div class="game-description">{{ game.description }}</div>
+              
               <div class="game-price">
                 {% if game.price == 0 %}Free{% else %}${{ game.price }}{% endif %}
               </div>
