@@ -120,8 +120,11 @@ class GameUploadSadPathTests(TestCase):
             'price': '9.99',
             'genre': 'RPG',
         })
-        # Table still exists and is queryable — ORM handled it safely
-        self.assertTrue(Game.objects.exists())
+        # Django's ORM safely stores the string without executing it - table still exists
+        # and the data is stored as a plain string, not interpreted as SQL
+        self.assertTrue(Game.objects.filter(
+            title="'; DROP TABLE home_game; --"
+        ).exists())
 
     def test_xss_in_description(self):
         # Django templates auto-escape XSS at render time, not save time.
@@ -132,8 +135,10 @@ class GameUploadSadPathTests(TestCase):
             'price': '9.99',
             'genre': 'RPG',
         })
-        # Game saves successfully — Django templates will escape it on render
-        self.assertTrue(Game.objects.filter(title='My Game').exists())
+        # Django stores the raw string and auto-escapes it on render - the data is safe
+        self.assertTrue(Game.objects.filter(
+            description='<script>alert("hacked")</script>'
+        ).exists())
 
     def test_unauthenticated_upload(self):
         # Should fail - user must be logged in to upload

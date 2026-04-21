@@ -122,6 +122,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "home/static")]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
 # URL used to access uploaded media files
 MEDIA_URL = "/media/"
 
@@ -137,7 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
 ]
 
-#Ai code review suggested removing this
+#Ai code review suggested removing this, i had to re-add it to get demos to work
 # Django's default X-Frame-Options is DENY, which blocks iframes loading
 # media files served from the same origin. SAMEORIGIN allows it.
 #X_FRAME_OPTIONS = 'SAMEORIGIN'
+#SECURE_CROSS_ORIGIN_OPENER_POLICY = None
