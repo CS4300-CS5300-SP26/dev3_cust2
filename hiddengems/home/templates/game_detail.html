@@ -373,14 +373,14 @@
             src="{{ game.thumbnail.url }}"
             alt="{{ game.title }} cover"
             class="game-cover"
-            onerror=<div style="width:100%;height:300px;background:rgba(15,10,35,0.6);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.25);">No Image</div>
+            onerror="this.style.display='none'"
           >
         {% elif game.game_id %}
           <img
             src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
             alt="{{ game.title }} cover"
             class="game-cover"
-            onerror=<div style="width:100%;height:300px;background:rgba(15,10,35,0.6);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.25);">No Image</div>
+            onerror="this.style.display='none'"
           >
         {% else %}
           <div style="width:100%;height:300px;background:rgba(15,10,35,0.6);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.25);">No Image</div>
