@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.core.cache import cache
+from django.core.validators import FileExtensionValidator
 
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
@@ -41,11 +42,19 @@ class Game(models.Model):
     other_platforms = models.CharField(max_length=200, blank=True)
 
     # Thumbnail image displayed on the game page
-    thumbnail = models.FileField(upload_to='game_thumbnails/', blank=True)
-
+    thumbnail = models.FileField(
+    upload_to='game_thumbnails/',
+    blank=True,
+    validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
+    # Never allow SVG — it executes JS when opened directly
+    )
+    
     # Optional uploaded build (zip or web build)
-    build_file = models.FileField(upload_to='game_builds/', blank=True)
-
+    build_file = models.FileField(
+    upload_to='game_builds/',
+    blank=True,
+    validators=[FileExtensionValidator(allowed_extensions=['zip', 'wasm'])]
+    )
     # Steam Integration
     storefront = models.CharField(max_length=50, default="steam")
     game_id = models.IntegerField(null=True, blank=True)

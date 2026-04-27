@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import decimal
 from .models import Game
+from django.core.validators import FileExtensionValidator  # add to imports
 
 # Form used by developers to upload a new game
 # ModelForm automatically creates fields based on the Game model
@@ -42,3 +43,25 @@ class GameUploadForm(forms.ModelForm):
         if price is not None and price >= 99999999:
             raise ValidationError("Price is too large.")
         return price
+    from django.core.validators import FileExtensionValidator  # add to imports
+
+    # Inside class Meta, update the model fields in models.py instead,
+    # but you can also add clean methods here in forms.py:
+
+    def clean_build_file(self):
+        f = self.cleaned_data.get('build_file')
+        if f:
+            allowed = ['zip', 'wasm']
+            ext = f.name.rsplit('.', 1)[-1].lower()
+            if ext not in allowed:
+                raise ValidationError("Build file must be a .zip or .wasm file.")
+        return f
+
+    def clean_thumbnail(self):
+        f = self.cleaned_data.get('thumbnail')
+        if f:
+            allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+            ext = f.name.rsplit('.', 1)[-1].lower()
+            if ext not in allowed:
+                raise ValidationError("Thumbnail must be jpg, png, gif, or webp. SVG is not allowed.")
+        return f

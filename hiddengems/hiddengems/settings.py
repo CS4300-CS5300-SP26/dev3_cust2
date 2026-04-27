@@ -14,6 +14,15 @@ from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 from dotenv import load_dotenv
 
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_HTTPONLY = True
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

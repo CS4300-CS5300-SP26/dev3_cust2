@@ -7,8 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous">
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
@@ -197,7 +199,10 @@
         {% if user.is_authenticated %}
           <span class="text-light btn-sm">Hi, {{ user.username }}</span>
           <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Submit a Game</a>
-          <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
+          <form method="post" action="/accounts/logout/" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+          </form>
         {% else %}
           <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Submit a Game</a>
           <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
@@ -287,6 +292,7 @@
   <p>© 2026 Hidden Gems • Built for Indie Game Lovers</p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmv6yC/7Va/kVP+mGweCJ5X3q9R9"
+        crossorigin="anonymous"></script></body>
 </html>
