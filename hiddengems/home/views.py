@@ -37,7 +37,8 @@ def _ai_parse_query(query):
                     "- genre: a single genre string (e.g. 'RPG', 'Platformer', 'Puzzle', 'Horror', 'Strategy'), "
                     "or null if not specified. Only set this if the user clearly references a game genre.\n"
                     "- free_only: boolean, true if the user asks for free games, games that cost nothing, or $0 games\n"
-                    "- max_price: maximum price as a number, or null if not specified\n\n"
+                    "- max_price: maximum price as a number, or null if not specified\n"
+                    "- browser_playable: boolean, true if the user wants games playable in the browser (e.g. 'play in browser', 'browser game', 'no download')\n\n"
                     "Be generous with keywords and vibe_keywords — err on the side of more terms to avoid empty results. "
                     "For purely vibe-based queries (e.g. 'something relaxing'), populate vibe_keywords even if keywords is empty."
                 ),
@@ -201,6 +202,13 @@ def browse(request):
                 games = games.filter(price__lte=0)
             elif filters.get("max_price") is not None:
                 games = games.filter(price__lte=filters["max_price"])
+
+            browser_terms = {"browser", "playable", "web game", "web", "online", "no download", "in browser"}
+            browser_phrases = ("browser", "playable in browser", "browser playable", "no download", "web game", "play online")
+            is_browser_search = filters.get("browser_playable") or any(kw in query.lower() for kw in browser_phrases)
+            if is_browser_search:
+                games = games.filter(playable_in_browser=True)
+                all_terms = [t for t in all_terms if t not in browser_terms]
 
             # Apply text + genre filters. Combine them with OR so that a game
             # matching the vibe OR the genre qualifies — this avoids zero results
