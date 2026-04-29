@@ -148,3 +148,10 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+INSTALLED_APPS += ['axes']
+MIDDLEWARE += ['axes.middleware.AxesMiddleware']
+AUTHENTICATION_BACKENDS = ['axes.backends.AxesStandaloneBackend', 'django.contrib.auth.backends.ModelBackend']
+AXES_FAILURE_LIMIT = 5      # Lock after 5 failures
+AXES_COOLOFF_TIME = 1       # Lock for 1 hour
+AXES_LOCKOUT_CALLABLE = 'home.views.lockout_response'
