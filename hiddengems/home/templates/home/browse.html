@@ -155,6 +155,58 @@
       margin-top: 10px;
     }
 
+    .genre-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .genre-pill {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.75);
+      background: rgba(26, 26, 46, 0.6);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .genre-pill:hover {
+      background: rgba(167,139,250,0.2);
+      border-color: #a78bfa;
+      color: #fff;
+    }
+
+    .genre-pill.active {
+      background: rgba(167,139,250,0.35);
+      border-color: #a78bfa;
+      color: #fff;
+    }
+
+    .active-genre-banner {
+      text-align: center;
+      margin-bottom: 24px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.95rem;
+    }
+
+    .game-genre-link {
+      font-size: 0.8rem;
+      color: rgba(167,139,250,0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .game-genre-link:hover { color: #a78bfa; }
+
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -220,6 +272,27 @@
   </div>
 </div>
 
+<!-- Genre Filter Bar -->
+{% if all_genres %}
+<div class="container">
+  <div class="genre-filter-bar">
+    <a href="{% url 'browse' %}" class="genre-pill {% if not active_genre %}active{% endif %}">All</a>
+    {% for genre in all_genres %}
+      <a href="{% url 'browse' %}?genre={{ genre.slug }}" class="genre-pill {% if active_genre.slug == genre.slug %}active{% endif %}">
+        {{ genre.name }}
+      </a>
+    {% endfor %}
+  </div>
+  {% if active_genre %}
+    <div class="active-genre-banner">
+      Showing <strong>{{ active_genre.name }}</strong> games
+      &nbsp;·&nbsp;
+      <a href="{% url 'browse' %}" style="color: rgba(167,139,250,0.8);">Clear filter</a>
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+
 <!-- Game Grid -->
 <div class="container mb-5">
   {% if games %}
@@ -240,7 +313,13 @@
                 </template>
               {% endif %}
             <div class="card-body">
-              <div class="game-genre">{{ game.genre|default:"Indie" }}</div>
+              <div class="game-genre">
+                {% for tag in game.genre_tags.all %}
+                  <a href="{% url 'browse' %}?genre={{ tag.slug }}" class="game-genre-link" onclick="event.stopPropagation()">{{ tag.name }}</a>{% if not forloop.last %} &middot; {% endif %}
+                {% empty %}
+                  {{ game.genre|default:"Indie" }}
+                {% endfor %}
+              </div>
               <div class="game-title">{{ game.title }}</div>
               <div class="game-description">{{ game.description }}</div>
               <div class="game-price">

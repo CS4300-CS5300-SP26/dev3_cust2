@@ -356,7 +356,18 @@
       <div class="game-meta">
         <p><span class="label">Developer:</span> {{ game.developer }}</p>
         <p><span class="label">Publisher:</span> {{ game.publisher|default:"n/a" }}</p>
-        {% if game.genre %}<p><span class="label">Genre:</span> {{ game.genre }}</p>{% endif %}
+        {% with tags=game.genre_tags.all %}
+          {% if tags %}
+            <p>
+              <span class="label">Genre:</span>
+              {% for tag in tags %}
+                <a href="{% url 'browse' %}?genre={{ tag.slug }}" style="color:#a78bfa; text-decoration:none;">{{ tag.name }}</a>{% if not forloop.last %} &middot; {% endif %}
+              {% endfor %}
+            </p>
+          {% elif game.genre %}
+            <p><span class="label">Genre:</span> {{ game.genre }}</p>
+          {% endif %}
+        {% endwith %}
         {% if game.other_platforms %}<p><span class="label">Also on:</span> {{ game.other_platforms }}</p>{% endif %}
         <p><span class="label">Price:</span> {% if game.price == 0 %}Free{% else %}${{ game.price }}{% endif %}</p>
       </div>
@@ -412,7 +423,11 @@
                   onerror="this.style.display='none'"
                 >
               {% endif %}
-              <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">{{ similar.genre|default:"Indie" }}</div>
+              <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">
+                {% with stags=similar.genre_tags.all %}
+                  {% if stags %}{% for t in stags %}{{ t.name }}{% if not forloop.last %} · {% endif %}{% endfor %}{% else %}{{ similar.genre|default:"Indie" }}{% endif %}
+                {% endwith %}
+              </div>
               <div style="font-size: 1rem; font-weight: 600; margin: 4px 0;">{{ similar.title }}</div>
               <div style="font-size: 0.875rem; color: rgba(255,255,255,0.7); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ similar.description }}</div>
               <div style="font-size: 0.9rem; font-weight: 600; color: #a78bfa; margin-top: 8px;">

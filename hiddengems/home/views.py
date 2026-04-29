@@ -1,14 +1,16 @@
 import json
 import os
 
+from django.core.cache import cache
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
 from openai import OpenAI
 
 from .forms import GameUploadForm
-from .models import Game
+from .models import CANONICAL_GENRES, Game, GenreTag
 from .utils import get_similar_games
 
 
@@ -57,6 +59,51 @@ def _ai_parse_query(query):
     return json.loads(raw)
 
 
+def _ai_tag_game(game):
+    """Call AI to assign 1–3 canonical genre tags to a game, then save and cache-bust."""
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    response = client.responses.create(
+        model="gpt-5.1-codex-mini",
+        input=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a game genre classifier. Given a game's info, assign 1–3 genre tags "
+                    "from this exact list: " + ", ".join(CANONICAL_GENRES) + ".\n\n"
+                    "Respond with ONLY a JSON array of strings, e.g. [\"Action\", \"RPG\"]. "
+                    "Pick only genres that clearly fit. Use fewer, accurate tags over many."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Title: {game.title}\n"
+                    f"Genre hint: {game.genre}\n"
+                    f"Description: {game.description[:600]}"
+                ),
+            },
+        ],
+    )
+    raw = response.output_text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    tag_names = json.loads(raw)
+    tag_names = [t for t in tag_names if t in CANONICAL_GENRES]
+
+    tags = []
+    for name in tag_names:
+        tag, _ = GenreTag.objects.get_or_create(name=name, defaults={"slug": slugify(name)})
+        tags.append(tag)
+
+    game.genre_tags.set(tags)
+    for tag in tags:
+        cache.delete(f"genre_games_{tag.slug}")
+
+
 # View that renders the homepage
 def index(request):
     return render(request, 'index.html')
@@ -91,6 +138,12 @@ def upload_game(request):
             # Save the game to the database
             game.save()
 
+            # Auto-assign AI genre tags (best-effort — don't fail upload on error)
+            try:
+                _ai_tag_game(game)
+            except Exception as e:
+                print(f"Genre tagging failed: {e}")
+
             # Redirect user after successful upload
             return redirect("index")
 
@@ -105,9 +158,25 @@ def upload_game(request):
 @require_GET
 def browse(request):
     query = request.GET.get("q", "").strip()
+    genre_slug = request.GET.get("genre", "").strip()
+    active_genre = None
     games = Game.objects.all().order_by("-created_at")
 
-    if query:
+    if genre_slug:
+        # Serve genre-filtered results from cache when available
+        cache_key = f"genre_games_{genre_slug}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            games = cached
+        else:
+            games = list(Game.objects.filter(genre_tags__slug=genre_slug).order_by("-created_at"))
+            cache.set(cache_key, games, 3600)
+        try:
+            active_genre = GenreTag.objects.get(slug=genre_slug)
+        except GenreTag.DoesNotExist:
+            pass
+
+    elif query:
         try:
             filters = _ai_parse_query(query)
 
@@ -137,11 +206,11 @@ def browse(request):
             # matching the vibe OR the genre qualifies — this avoids zero results
             # when genre tags in the DB don't perfectly match the AI's genre label.
             if all_terms and genre:
-                games = games.filter(text_filter | Q(genre__icontains=genre))
+                games = games.filter(text_filter | Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre))
             elif all_terms:
                 games = games.filter(text_filter)
             elif genre:
-                games = games.filter(genre__icontains=genre)
+                games = games.filter(Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre))
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
 
@@ -155,7 +224,14 @@ def browse(request):
                 | Q(genre__icontains=query)
             )
 
-    return render(request, "home/browse.html", {"games": games, "query": query})
+    all_genres = GenreTag.objects.filter(games__isnull=False).distinct()
+
+    return render(request, "home/browse.html", {
+        "games": games,
+        "query": query,
+        "active_genre": active_genre,
+        "all_genres": all_genres,
+    })
 
 
 @xframe_options_sameorigin
