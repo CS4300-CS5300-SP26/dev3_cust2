@@ -299,34 +299,35 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
       {% for game in games %}
         <div class="col">
-          <a href="{% url 'game_detail' game.slug %}" class="game-card">
+          <div class="game-card position-relative">
             {% if game.game_id %}
-                <img
-                  src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
-                  alt="{{ game.title }} cover"
-                  class="game-card.cover"
-                  onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
-                >
-
-                <template id="no-image-template">
-                  <div style="width: 100%; height: 180px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
-                </template>
-              {% endif %}
+              <img
+                src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
+                alt="{{ game.title }} cover"
+                class="game-card.cover"
+                onerror="this.replaceWith(document.getElementById('no-image-template').content.cloneNode(true))"
+              >
+              <template id="no-image-template">
+                <div style="width: 100%; height: 180px; background: rgba(15,10,35,0.6); border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 0.85rem;">No Image</div>
+              </template>
+            {% endif %}
             <div class="card-body">
-              <div class="game-genre">
+              <div class="game-genre" style="position: relative; z-index: 2;">
                 {% for tag in game.genre_tags.all %}
-                  <a href="{% url 'browse' %}?genre={{ tag.slug }}" class="game-genre-link" onclick="event.stopPropagation()">{{ tag.name }}</a>{% if not forloop.last %} &middot; {% endif %}
+                  <a href="{% url 'browse' %}?genre={{ tag.slug }}" class="game-genre-link">{{ tag.name }}</a>{% if not forloop.last %} &middot; {% endif %}
                 {% empty %}
                   {{ game.genre|default:"Indie" }}
                 {% endfor %}
               </div>
-              <div class="game-title">{{ game.title }}</div>
+              <div class="game-title">
+                <a href="{% url 'game_detail' game.slug %}" class="stretched-link" style="color: inherit; text-decoration: none;">{{ game.title }}</a>
+              </div>
               <div class="game-description">{{ game.description }}</div>
               <div class="game-price">
                 {% if game.price == 0 %}Free{% else %}${{ game.price }}{% endif %}
               </div>
             </div>
-          </a>
+          </div>
         </div>
       {% endfor %}
     </div>

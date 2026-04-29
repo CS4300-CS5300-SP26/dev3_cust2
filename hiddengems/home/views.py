@@ -169,7 +169,7 @@ def browse(request):
         if cached is not None:
             games = cached
         else:
-            games = list(Game.objects.filter(genre_tags__slug=genre_slug).order_by("-created_at"))
+            games = list(Game.objects.filter(genre_tags__slug=genre_slug).order_by("-created_at").distinct())
             cache.set(cache_key, games, 3600)
         try:
             active_genre = GenreTag.objects.get(slug=genre_slug)
@@ -206,11 +206,11 @@ def browse(request):
             # matching the vibe OR the genre qualifies — this avoids zero results
             # when genre tags in the DB don't perfectly match the AI's genre label.
             if all_terms and genre:
-                games = games.filter(text_filter | Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre))
+                games = games.filter(text_filter | Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
             elif all_terms:
                 games = games.filter(text_filter)
             elif genre:
-                games = games.filter(Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre))
+                games = games.filter(Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
 
