@@ -2,6 +2,7 @@ import json
 import os
 
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
@@ -10,6 +11,69 @@ from openai import OpenAI
 from .forms import GameUploadForm
 from .models import Game
 from .utils import get_similar_games
+
+
+def lockout_response(request, credentials, *args, **kwargs):
+    return HttpResponse(
+        """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Account Locked – Hidden Gems</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+          <style>
+            body {
+              font-family: 'Poppins', sans-serif;
+              background: linear-gradient(135deg, #0f0a23 0%, #1a1a2e 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #fff;
+              margin: 0;
+            }
+            .lockout-box {
+              background: rgba(26, 26, 46, 0.9);
+              border: 1px solid rgba(255,255,255,0.08);
+              border-radius: 20px;
+              padding: 48px 40px;
+              max-width: 460px;
+              text-align: center;
+              backdrop-filter: blur(10px);
+            }
+            .lockout-icon { font-size: 3rem; margin-bottom: 16px; }
+            h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 12px; }
+            p { color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 0; }
+            a {
+              display: inline-block;
+              margin-top: 28px;
+              padding: 10px 28px;
+              border-radius: 10px;
+              border: 1px solid rgba(255,255,255,0.25);
+              color: #fff;
+              text-decoration: none;
+              font-size: 0.9rem;
+              transition: background 0.2s;
+            }
+            a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+          </style>
+        </head>
+        <body>
+          <div class="lockout-box">
+            <div class="lockout-icon">&#128274;</div>
+            <h1>Account Temporarily Locked</h1>
+            <p>Too many failed login attempts. Please wait <strong>1 hour</strong> before trying again.</p>
+            <a href="/">Back to Home</a>
+          </div>
+        </body>
+        </html>
+        """,
+        status=403,
+        content_type="text/html",
+    )
 
 
 def _ai_parse_query(query):
