@@ -179,7 +179,11 @@ def browse(request):
 
     elif query:
         try:
-            filters = _ai_parse_query(query)
+            cache_key = f"ai_query_{hash(query)}"
+            filters = cache.get(cache_key)
+            if filters is None:
+                filters = _ai_parse_query(query)
+                cache.set(cache_key, filters, 3600)
 
             # Build a combined text filter from keywords + vibe_keywords
             keywords = filters.get("keywords") or []
