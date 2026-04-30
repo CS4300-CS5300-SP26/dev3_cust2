@@ -23,18 +23,22 @@ import sys
 import requests
 
 # ── CLI args ──────────────────────────────────────────────────────────────────
-parser = argparse.ArgumentParser(description="HiddenGems security fix tests")
-parser.add_argument("--base-url", default="http://localhost:8000",
-                    help="Base URL of the running app (no trailing slash)")
-parser.add_argument("--username", default="testuser",
-                    help="Existing test account username")
-parser.add_argument("--password", default="testpass123",
-                    help="Existing test account password")
-args = parser.parse_args()
-
-BASE = args.base_url.rstrip("/")
-USERNAME = args.username
-PASSWORD = args.password
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="HiddenGems security fix tests")
+    parser.add_argument("--base-url", default="http://localhost:8000",
+                        help="Base URL of the running app (no trailing slash)")
+    parser.add_argument("--username", default="testuser",
+                        help="Existing test account username")
+    parser.add_argument("--password", default="testpass123",
+                        help="Existing test account password")
+    args = parser.parse_args()
+    BASE = args.base_url.rstrip("/")
+    USERNAME = args.username
+    PASSWORD = args.password
+else:
+    BASE = "http://localhost:8000"
+    USERNAME = "testuser"
+    PASSWORD = "testpass123"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 PASS = "\033[92m[PASS]\033[0m"

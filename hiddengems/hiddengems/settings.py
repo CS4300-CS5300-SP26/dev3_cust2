@@ -141,3 +141,10 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_HTTPONLY = True
+    
+if not DEBUG and os.getenv('SECURE_SSL', 'False') == 'True':
+    SECURE_SSL_REDIRECT = True
+
+import sys
+if 'test' in sys.argv:
+    AXES_ENABLED = False
