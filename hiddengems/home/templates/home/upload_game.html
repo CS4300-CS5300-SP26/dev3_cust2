@@ -153,8 +153,18 @@
     <nav>
         <a href="/" class="logo">Hidden Gems</a>
         <div class="nav-buttons">
-            <a href="#">Login</a>
-            <a href="#">Sign Up</a>
+            {% if user.is_authenticated %}
+                <!-- Show username and logout when logged in -->
+                <span style="color: white; padding: 8px 10px; font-size: 0.9rem;">Hi, {{ user.username }}</span>
+                <form method="post" action="{% url 'logout' %}" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" style="padding:8px 20px;border:1px solid white;border-radius:6px;color:white;background:transparent;cursor:pointer;font-size:0.9rem;">Logout</button>
+                </form>
+            {% else %}
+                <!-- Show login and sign up when not logged in -->
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Sign Up</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -168,6 +178,13 @@
 
                 <!-- Django CSRF security token -->
                 {% csrf_token %}
+                
+                <!-- Shows non-field errors at the top -->
+                {% if form.errors %}
+                <div style="background:#7f1d1d;border-radius:8px;padding:14px 18px;margin-bottom:24px;color:#fecaca;font-size:0.9rem;">
+                    Please fix the errors below before uploading.
+                </div>
+                {% endif %}
 
                 <div class="field-group">
                     <label for="id_title">Game Title</label>
@@ -182,6 +199,9 @@
                 <div class="field-group">
                     <label for="id_price">Price ($)</label>
                     {{ form.price }}
+                    {% if form.price.errors %}
+                        <p style="color:#f87171;font-size:0.82rem;margin-top:4px;">{{ form.price.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <div class="field-group">
@@ -202,11 +222,17 @@
                 <div class="field-group">
                     <label for="id_thumbnail">Thumbnail Image</label>
                     {{ form.thumbnail }}
+                    {% if form.thumbnail.errors %}
+                        <p style="color:#f87171;font-size:0.82rem;margin-top:4px;">{{ form.thumbnail.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <div class="field-group">
                     <label for="id_build_file">Game Build File (ZIP)</label>
                     {{ form.build_file }}
+                    {% if form.build_file.errors %}
+                        <p style="color:#f87171;font-size:0.82rem;margin-top:4px;">{{ form.build_file.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <button type="submit" class="submit-btn">Upload Game</button>

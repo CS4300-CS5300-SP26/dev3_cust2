@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
-
+from django.dispatch import receiver
+from django.core.cache import cache
+from django.core.validators import FileExtensionValidator
 
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
@@ -10,14 +12,19 @@ class Game(models.Model):
     title = models.CharField(max_length=200)
 
     # URL-friendly slug generated from title
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
 
     # Full description of the game (story, mechanics, etc.)
     description = models.TextField()
 
-    # The developer who uploaded the game
-    # Linked to Django's built-in User model
-    developer = models.ForeignKey(User, on_delete=models.CASCADE)
+    # Developer name as a string (e.g. "Indie Studio X")
+    developer = models.CharField(max_length=200, blank=True)
+
+    # The user who uploaded the game
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_games', null=True, blank=True)
+
+    # Users authorized to edit this game
+    authorized_users = models.ManyToManyField(User, related_name='authorized_games', blank=True)
 
     # Publisher of the game
     publisher = models.CharField(max_length=200, blank=True)
@@ -35,11 +42,19 @@ class Game(models.Model):
     other_platforms = models.CharField(max_length=200, blank=True)
 
     # Thumbnail image displayed on the game page
-    thumbnail = models.FileField(upload_to='game_thumbnails/', blank=True)
-
+    thumbnail = models.FileField(
+    upload_to='game_thumbnails/',
+    blank=True,
+    validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
+    # Never allow SVG — it executes JS when opened directly
+    )
+    
     # Optional uploaded build (zip or web build)
-    build_file = models.FileField(upload_to='game_builds/', blank=True)
-
+    build_file = models.FileField(
+    upload_to='game_builds/',
+    blank=True,
+    validators=[FileExtensionValidator(allowed_extensions=['zip', 'wasm'])]
+    )
     # Steam Integration
     storefront = models.CharField(max_length=50, default="steam")
     game_id = models.IntegerField(null=True, blank=True)
@@ -50,9 +65,36 @@ class Game(models.Model):
     # Auto-generate slug from title if not provided
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title) or "game"
+            slug = base_slug
+            counter = 1
+
+            while Game.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
     # String representation of the object in admin panel
     def __str__(self):
         return self.title
+
+@receiver(models.signals.post_save, sender=Game)
+def invalidate_similar_games_cache(sender, instance, **kwargs):
+    cache.delete(f"similar_games_{instance.pk}")
+    SimilarGame.objects.filter(game=instance).delete()
+
+class SimilarGame(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='similar_games')
+    similar = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='similar_to')
+    score = models.FloatField()
+    computed_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-score']
+        unique_together = [['game', 'similar']]
+
+    def __str__(self):
+        return f"{self.game.title} -> {self.similar.title} ({self.score:.2f})"

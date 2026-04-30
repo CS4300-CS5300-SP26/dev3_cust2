@@ -1,0 +1,15 @@
+{
+  "name": "HiddenGems Dev Env",
+  "image": "deveduio/django:latest",
+
+  "runArgs": [
+    "--env-file", "hiddengems/.env"
+  ],
+
+  "forwardPorts": [80, 3000],
+
+  "postCreateCommand": "pip install -r hiddengems/requirements.txt",
+
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind"
+}

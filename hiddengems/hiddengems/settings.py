@@ -12,13 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+load_dotenv(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
@@ -26,15 +25,10 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# SECURITY WARNING: sets USE SQLITE TO TRUE
-os.environ['USE_SQLITE'] = "true"
-
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                    "127.0.0.1,localhost,24.199.106.168,app-jroyer-21.devedu.io").split(",")
+                    "127.0.0.1,localhost").split(",")
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,16 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'accounts',
+    'axes',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 ROOT_URLCONF = 'hiddengems.urls'
@@ -77,26 +79,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hiddengems.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#database
-
-"""
-#commenting out this code to try a different database method temporarily
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hiddengems',
-        'USER': 'admin',
-        'PASSWORD': 'AdminPassword1',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-#Trying this instead:
-"""
-
-if os.environ.get("USE_SQLITE") == "true":
+if os.getenv("DEVELOPMENT_MODE") == "True":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -107,63 +90,61 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'hiddengems',
-            'USER': 'admin',
-            'PASSWORD': 'AdminPassword1',
-            'HOST': 'localhost',
-            'PORT': '',
+            'NAME': os.getenv("DB_NAME", "hiddengems"),
+            'USER': os.getenv("DB_USER", "admin"),
+            'PASSWORD': os.getenv("DB_PASSWORD", ""),
+            'HOST': os.getenv("DB_HOST", "localhost"),
+            'PORT': os.getenv("DB_PORT", "")
         }
     }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "home/static")]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# URL used to access uploaded media files
+# Full set of password validators — do not trim this list
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
 MEDIA_URL = "/media/"
-
-# Folder where uploaded files will be stored
 MEDIA_ROOT = BASE_DIR / "media"
-
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = ["https://app-bcurtis-21.devedu.io"]
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
+
+# Allow iframes to load media files served from the same origin.
+# Django's default X-Frame-Options is DENY, which blocks same-origin iframes.
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+# Rate limiting — lock after 5 failed login attempts for 1 hour
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+
+# Security headers — only active in production
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_HTTPONLY = True
+    
+if not DEBUG and os.getenv('SECURE_SSL', 'False') == 'True':
+    SECURE_SSL_REDIRECT = True
+
+import sys
+if 'test' in sys.argv:
+    AXES_ENABLED = False

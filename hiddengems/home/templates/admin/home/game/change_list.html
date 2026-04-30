@@ -1,0 +1,17 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+<ul class="object-tools">
+    <li>
+        <a href="{% url 'admin:home_game_sync_update_all' %}">
+            Update Steam games by range
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'admin:home_game_sync_update_one' %}">
+            Update one by Steam ID
+        </a>
+    </li>
+    {{ block.super }}
+</ul>
+{% endblock %}

@@ -1,0 +1,36 @@
+# Contributed by Devin Haggitt
+# Modified April 7th, 2026
+
+# Function: This automation file will run when 
+# a push is made to main
+
+name: Deploy to DigitalOcean
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch: # allows manual deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
+    
+    - name: Deploy to Droplet
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+          cd /home/django/dev3_cust2/hiddengems
+          git pull origin main
+          pip install -r requirements.txt
+          python3 manage.py migrate
+          python3 manage.py collectstatic --noinput
+          sudo systemctl restart gunicorn 
+        '
+
+### WORK IN PROGRESS ###

@@ -1,58 +1,536 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
+  <meta charset="UTF-8">
+  <title>{{ game.title }} – Hidden Gems</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        .game-card {
-            max-width: 700px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 24px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous">
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-        .game-title {
-            font-size: 2rem;
-            margin: 0 0 16px;
-        }
+  
+  <style>
+    :root {
+      --bg-main: #0f0a23;
+      --panel: rgba(26, 26, 46, 0.85);
+      --panel-strong: rgba(26, 26, 46, 0.95);
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0ff;
+      --text-muted: #aaa;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --shadow-strong: 0 14px 35px rgba(0, 0, 0, 0.35);
+    }
 
-        .game-description {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+    * { box-sizing: border-box; }
 
-        .game-meta p {
-            margin: 8px 0;
-        }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      background:
+        linear-gradient(rgba(10, 8, 24, 0.78), rgba(10, 8, 24, 0.88)),
+        url("https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.game_id }}/header.jpg");
+      background-size: cover;
+      background-position: top center;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
 
-        .label {
-            font-weight: bold;
-        }
-    </style>
+    .navbar {
+      background-color: rgba(15, 12, 32, 0.82);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    .game-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 600px;
+      gap: 32px;
+      align-items: start;
+      padding: 24px;
+      background: rgba(10, 8, 24, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .game-main { min-width: 0; }
+
+    .game-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      margin: 0 0 18px;
+    }
+
+    .game-meta { margin-bottom: 20px; font-size: 1.05rem; }
+    .game-meta p { margin: 0 0 10px; }
+    .label { color: #fff; font-weight: 600; margin-right: 6px; }
+
+    .badge-browser {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.8);
+      color: white;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .description-box {
+      background: var(--panel);
+      box-shadow: var(--shadow-soft);
+      border-radius: 18px;
+      padding: 24px;
+      min-height: 260px;
+      color: #f3f0ff;
+      line-height: 1.7;
+    }
+
+    .game-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .cover-frame {
+      width: 100%;
+      max-width: 600px;
+      background: var(--panel);
+      border: none;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .game-cover {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .purchase-button {
+      display: inline-block;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      background: var(--panel-strong);
+      border: none;
+      border-radius: 16px;
+      padding: 18px 24px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .purchase-button:hover {
+      transform: translateY(-2px);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .purchase-button .top-text {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .purchase-button .bottom-text {
+      display: block;
+      margin-top: 6px;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .similar-game-card {
+      max-width: 100%;
+      margin: 0;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .similar-game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      color: #fff;
+    }
+
+    /* ── Browser Demo Section ── */
+    .demo-section {
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 2px dashed rgba(216, 209, 243, 0.35);
+    }
+
+    .game-embed-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0a0a1a;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+    }
+
+    .game-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 10, 26, 0.88);
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .game-overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .game-overlay-thumb {
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+
+    .play-btn {
+      position: relative;
+      z-index: 2;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+      margin-bottom: 14px;
+    }
+
+    .play-btn:hover { transform: scale(1.1); background: rgba(99, 102, 241, 1); }
+
+    .play-btn svg {
+      width: 36px;
+      height: 36px;
+      fill: white;
+      margin-left: 5px;
+    }
+
+    .overlay-label {
+      position: relative;
+      z-index: 2;
+      font-size: 1rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    #game-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .embed-controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .fullscreen-btn {
+      background: rgba(99, 102, 241, 0.8);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .fullscreen-btn:hover { background: rgba(79, 70, 229, 1); }
+
+    .future-section {
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 2px dashed rgba(216, 209, 243, 0.35);
+    }
+
+    .future-panel {
+      min-height: 380px;
+      background: rgba(10, 8, 24, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .future-panel h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.5rem; }
+    .future-panel p { color: var(--text-muted); margin-bottom: 0; }
+
+    footer {
+      background: rgba(15, 12, 32, 0.82);
+      color: #aaa;
+      padding: 28px 0;
+      text-align: center;
+      margin-top: 40px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Hover effects on cards */
+    .description-box,
+    .cover-frame,
+    .purchase-button {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .description-box:hover,
+    .cover-frame:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-strong);
+    }
+
+    @media (max-width: 1100px) {
+      .game-hero { grid-template-columns: 1fr; }
+      .game-side { align-items: flex-start; }
+      .cover-frame, .purchase-button { max-width: 420px; }
+    }
+
+    @media (max-width: 768px) {
+      .page-shell { padding: 24px 14px 40px; }
+      .game-hero { padding: 18px; gap: 22px; }
+      .description-box { min-height: 0; }
+    }
+  </style>
 </head>
 <body>
-    <div class="game-card">
-        <h1 class="game-title">{{ title }}</h1>
 
-        <div class="game-description">
-            {{ description }}
-        </div>
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/">Hidden Gems</a>
 
-        <div class="game-meta">
-            <p><span class="label">Publisher:</span> {{ publisher }}</p>
-            <p><span class="label">Developer:</span> {{ developer }}</p>
-        </div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+      <div class="d-flex gap-2">
+        {% if user.is_authenticated %}
+          <span class="text-light btn-sm">Hi, {{ user.username }}</span>
+          <form method="post" action="/accounts/logout/" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+          </form>
+        {% else %}
+          <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
+        {% endif %}
+      </div>
     </div>
+  </div>
+</nav>
+
+<main class="page-shell">
+  <section class="game-hero">
+    <div class="game-main">
+
+      {% if game.playable_in_browser %}
+        <span class="badge-browser">&#127918; Playable in Browser</span>
+      {% endif %}
+
+      <h1 class="game-title">{{ game.title }}</h1>
+
+      <div class="game-meta">
+        <p><span class="label">Developer:</span> {{ game.developer }}</p>
+        <p><span class="label">Publisher:</span> {{ game.publisher|default:"n/a" }}</p>
+        {% if game.genre %}<p><span class="label">Genre:</span> {{ game.genre }}</p>{% endif %}
+        {% if game.other_platforms %}<p><span class="label">Also on:</span> {{ game.other_platforms }}</p>{% endif %}
+        <p><span class="label">Price:</span> {% if game.price == 0 %}Free{% else %}${{ game.price }}{% endif %}</p>
+      </div>
+
+      <div class="description-box">
+        {{ game.description }}
+      </div>
+    </div>
+
+    <aside class="game-side">
+      <div class="cover-frame">
+        {% if game.thumbnail %}
+          <img
+            src="{{ game.thumbnail.url }}"
+            alt="{{ game.title }} cover"
+            class="game-cover"
+            onerror="this.style.display='none'"
+          >
+        {% elif game.game_id %}
+          <img
+            src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ game.game_id }}/library_600x900.jpg"
+            alt="{{ game.title }} cover"
+            class="game-cover"
+            onerror="this.style.display='none'"
+          >
+        {% else %}
+          <div style="width:100%;height:300px;background:rgba(15,10,35,0.6);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.25);">No Image</div>
+        {% endif %}
+      </div>
+
+      {% if game.storefront == "steam" and game.game_id %}
+        <a href="https://store.steampowered.com/app/{{ game.game_id }}" class="purchase-button">
+          <span class="top-text">Purchase on Steam</span>
+          <span class="bottom-text">{% if game.price == 0 %}Free{% else %}${{ game.price }}{% endif %}</span>
+        </a>
+      {% else %}
+        <div class="purchase-button" style="opacity:0.6;cursor:default;">
+          <span class="top-text">Purchase</span>
+          <span class="bottom-text">Coming soon</span>
+        </div>
+      {% endif %}
+    </aside>
+  </section>
+
+  <!-- Similar Games -->
+  {% if similar_games %}
+  <section class="container my-5">
+    <h2 class="text-center mb-4" style="font-weight: 700;">Similar Games</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for similar in similar_games %}
+        <div class="col">
+          <a href="{% url 'game_detail' similar.slug %}" style="text-decoration: none; color: #fff;">
+            <div class="similar-game-card" style="background: rgba(26,26,46,0.85); border-radius: 15px; padding: 20px; backdrop-filter: blur(6px);">
+              
+              {% if similar.thumbnail %}
+                <img
+                  src="{{ similar.thumbnail.url }}"
+                  alt="{{ similar.title }} cover"
+                  style="width:100%; aspect-ratio: 2/3; object-fit:cover;border-radius:10px;margin-bottom:12px;"
+                  onerror="this.style.display='none'"
+                >
+
+              {% elif similar.game_id %}
+                <img
+                  src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{{ similar.game_id }}/library_600x900.jpg"
+                  alt="{{ similar.title }} cover"
+                  style="width:100%; aspect-ratio: 2/3; object-fit:cover;border-radius:10px;margin-bottom:12px;"
+                  onerror="this.style.display='none'"
+                >
+              {% endif %}
+              <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;">{{ similar.genre|default:"Indie" }}</div>
+              <div style="font-size: 1rem; font-weight: 600; margin: 4px 0;">{{ similar.title }}</div>
+              <div style="font-size: 0.875rem; color: rgba(255,255,255,0.7); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ similar.description }}</div>
+              <div style="font-size: 0.9rem; font-weight: 600; color: #a78bfa; margin-top: 8px;">
+                {% if similar.price == 0 %}Free{% else %}${{ similar.price }}{% endif %}
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Browser Demo Embed (only shown if game has a build file and is marked playable) -->
+  {% if game.playable_in_browser and game.build_file %}
+  <section class="demo-section container">
+    <h2>&#9654; Play Demo in Browser</h2>
+
+    <div class="game-embed-wrapper" id="embed-wrapper" data-build-url="{{ game.build_file.url|escapejs }}">
+
+      <!-- Click-to-play overlay -->
+      <div class="game-overlay" id="game-overlay" onclick="launchGame()">
+        {% if game.thumbnail %}
+          <img class="game-overlay-thumb" src="{{ game.thumbnail.url }}" alt="">
+        {% endif %}
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="5,3 19,12 5,21"/>
+          </svg>
+        </div>
+        <span class="overlay-label">Click to Play</span>
+      </div>
+
+      <iframe
+        id="game-iframe"
+        title="{{ game.title }} browser demo"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin"
+        allow="autoplay; fullscreen *; pointer-lock *"
+      ></iframe>
+
+    </div>
+
+    <div class="embed-controls">
+      <button class="fullscreen-btn" onclick="goFullscreen()">&#9974; Fullscreen</button>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="future-section">
+    <div class="future-panel">
+      <h2>More features coming here</h2>
+      <p>This section is reserved for future modules like ratings, YouTube videos, and other game-related content.</p>
+    </div>
+  </section>
+</main>
+
+<!-- CTA -->
+<section class="container my-5">
+  <div class="cta-section">
+    <h2>Have a Hidden Gem to Share?</h2>
+    <p class="text-secondary">Help others discover amazing indie games by uploading your own title.</p>
+    <a href="/upload/" class="btn btn-outline-light btn-lg">Upload a Game</a>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 Hidden Gems &bull; Built for Indie Game Lovers</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmv6yC/7Va/kVP+mGweCJ5X3q9R9"
+        crossorigin="anonymous"></script>
+<script>
+  function launchGame() {
+    const iframe = document.getElementById('game-iframe');
+    const overlay = document.getElementById('game-overlay');
+    const wrapper = document.getElementById('embed-wrapper');
+
+    const buildUrl = wrapper ? wrapper.dataset.buildUrl : null;
+    if (!buildUrl) return;
+
+    iframe.src = buildUrl;
+    overlay.classList.add('hidden');
+  }
+
+  function goFullscreen() {
+    const wrapper = document.getElementById('embed-wrapper');
+    if (!wrapper) return;
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
+  }
+</script>
+
 </body>
 </html>
