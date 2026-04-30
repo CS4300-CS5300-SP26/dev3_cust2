@@ -6,17 +6,14 @@ from django.views.decorators.http import require_POST
 
 # View that handles user login
 def login_view(request):
-    # If user is already logged in, send them to homepage
     if request.user.is_authenticated:
         return redirect('index')
     if request.method == 'POST':
-        # Get submitted login form data
-        form = AuthenticationForm(data=request.POST)
+        # pass request as first argument so axes can track login attempts
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            # Authenticate the user
             user = form.get_user()
             login(request, user)
-            # Safely validate the next URL before redirecting
             next_url = request.GET.get('next', '')
             if url_has_allowed_host_and_scheme(
                 url=next_url,
@@ -26,10 +23,8 @@ def login_view(request):
                 return redirect(next_url)
             return redirect('index')
     else:
-        # Show empty login form
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
-
 # View that handles user signup
 def signup_view(request):
     # If user is already logged in, send them to homepage
