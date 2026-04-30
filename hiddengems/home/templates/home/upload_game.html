@@ -153,8 +153,15 @@
     <nav>
         <a href="/" class="logo">Hidden Gems</a>
         <div class="nav-buttons">
-            <a href="#">Login</a>
-            <a href="#">Sign Up</a>
+            {% if user.is_authenticated %}
+                <!-- Show username and logout when logged in -->
+                <span style="color: white; padding: 8px 10px; font-size: 0.9rem;">Hi, {{ user.username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <!-- Show login and sign up when not logged in -->
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Sign Up</a>
+            {% endif %}
         </div>
     </nav>
 

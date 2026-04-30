@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Update Steam games by range</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div style="margin-bottom: 1rem;">
+        <label for="start_id">Start Steam ID:</label>
+        <input type="text" name="start_id" id="start_id" required>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <label for="end_id">End Steam ID:</label>
+        <input type="text" name="end_id" id="end_id" required>
+    </div>
+
+    <div style="margin-top: 1rem;">
+        <button type="submit" class="default">Run Update</button>
+        <a href="{% url 'admin:home_game_changelist' %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

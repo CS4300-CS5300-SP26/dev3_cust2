@@ -1,0 +1,7 @@
+services:
+  app:
+    build: .
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env

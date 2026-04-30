@@ -4,8 +4,16 @@ __pycache__/
 venv/
 db.sqlite3
 
-# Ignore SSH keys if present
+# Ignore SSH and env keys if present
 .ssh
+.env
 
-#Ignore Staticfiles
+# Ignore Staticfiles
 hiddengems/staticfiles/
+
+# Ignore user generated files
+media/
+
+# Ignore database dumps
+*.dump
+*backup.json
