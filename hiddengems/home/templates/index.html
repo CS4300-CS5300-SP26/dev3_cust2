@@ -125,6 +125,7 @@
         {% if user.is_authenticated %}
         <span class="text-light btn-sm">Hi, {{ user.username }}</span>
         <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Upload a Game</a>
+        <a href="{% url 'user_page' user.username %}" class="btn btn-outline-light btn-sm">Favorites</a>
         <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
     {% else %}
         <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>

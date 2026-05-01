@@ -3,8 +3,11 @@ import os
 
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from openai import OpenAI
 
 from .forms import GameUploadForm
@@ -176,4 +179,31 @@ def purchase_game(request, game_id):
         "storefront": game.storefront,
         "price": game.price,
         "game_id": game.game_id,
+    })
+
+
+@login_required
+def toggle_favorite(request, game_id):
+    print("GAME ID RECEIVED:", game_id)
+    game = get_object_or_404(Game, id=game_id)
+    profile = request.user.profile
+
+    if game in profile.favorites.all():
+        profile.favorites.remove(game)
+        status = "removed"
+    else:
+        profile.favorites.add(game)
+        status = "added"
+
+    return JsonResponse({"status": status})
+
+
+@login_required
+def user_page(request, username):
+    user_obj = get_object_or_404(User, username=username)
+    favorites = user_obj.profile.favorites.all()
+
+    return render(request, "user.html", {
+        "favorites": favorites,
+        "profile_user": user_obj,
     })

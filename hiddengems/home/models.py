@@ -72,6 +72,13 @@ class Game(models.Model):
     def __str__(self):
         return self.title
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorites = models.ManyToManyField(Game, blank=True, related_name="favorited_by")
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
 @receiver(models.signals.post_save, sender=Game)
 def invalidate_similar_games_cache(sender, instance, **kwargs):
     cache.delete(f"similar_games_{instance.pk}")
