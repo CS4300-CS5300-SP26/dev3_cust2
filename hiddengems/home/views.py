@@ -172,6 +172,16 @@ def game_detail(request, slug):
     })
 
 
+def purchase_game(request, game_id):
+    game = get_object_or_404(Game, game_id=game_id)
+
+    return render(request, "purchase_game.html", {
+        "storefront": game.storefront,
+        "price": game.price,
+        "game_id": game.game_id,
+    })
+
+
 @login_required
 def toggle_favorite(request, game_id):
     print("GAME ID RECEIVED:", game_id)

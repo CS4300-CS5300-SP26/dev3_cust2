@@ -19,6 +19,9 @@ urlpatterns = [
     # Game detail page accessed by slug
     path("game/<slug:slug>/", views.game_detail, name="game_detail"),
 
+    # Game detail page accessed by slug
+    path("game/<slug:slug>/", views.game_detail, name="game_detail"),
+
     path("favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"),
 
     path("user/<str:username>/", views.user_page, name="user_page"),
