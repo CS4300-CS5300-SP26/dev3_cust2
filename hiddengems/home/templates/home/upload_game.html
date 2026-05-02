@@ -178,6 +178,13 @@
 
                 <!-- Django CSRF security token -->
                 {% csrf_token %}
+                
+                <!-- Shows non-field errors at the top -->
+                {% if form.errors %}
+                <div style="background:#7f1d1d;border-radius:8px;padding:14px 18px;margin-bottom:24px;color:#fecaca;font-size:0.9rem;">
+                    Please fix the errors below before uploading.
+                </div>
+                {% endif %}
 
                 <!-- Shows non-field errors at the top -->
                 {% if form.errors %}
