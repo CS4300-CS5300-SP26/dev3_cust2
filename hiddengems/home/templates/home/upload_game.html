@@ -186,6 +186,13 @@
                 </div>
                 {% endif %}
 
+                <!-- Shows non-field errors at the top -->
+                {% if form.errors %}
+                <div style="background:#7f1d1d;border-radius:8px;padding:14px 18px;margin-bottom:24px;color:#fecaca;font-size:0.9rem;">
+                    Please fix the errors below before uploading.
+                </div>
+                {% endif %}
+
                 <div class="field-group">
                     <label for="id_title">Game Title</label>
                     {{ form.title }}
@@ -214,6 +221,24 @@
                     {{ form.other_platforms }}
                 </div>
 
+                <!-- Steam availability toggle -->
+                <div class="checkbox-group">
+                    {{ form.on_steam }}
+                    <label for="id_on_steam">Is this game on Steam?</label>
+                </div>
+
+                <!-- Steam App ID — shown only when the Steam checkbox is checked -->
+                <div class="field-group" id="steam-id-field" style="display: none;">
+                    <label for="id_steam_id">Steam App ID</label>
+                    {{ form.steam_id }}
+                    <p style="color:#6b7280;font-size:0.82rem;margin-top:4px;">
+                        Find it in the URL on the Steam store page — e.g. store.steampowered.com/app/<strong>440</strong>/
+                    </p>
+                    {% if form.steam_id.errors %}
+                        <p style="color:#f87171;font-size:0.82rem;margin-top:4px;">{{ form.steam_id.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
                 <div class="checkbox-group">
                     {{ form.playable_in_browser }}
                     <label for="id_playable_in_browser">Playable in browser</label>
@@ -240,6 +265,21 @@
             </form>
         </div>
     </div>
+
+    <script>
+        const onSteamCheckbox = document.getElementById('id_on_steam');
+        const steamIdField = document.getElementById('steam-id-field');
+
+        // Show or hide the Steam App ID field based on checkbox state
+        function toggleSteamId() {
+            steamIdField.style.display = onSteamCheckbox.checked ? 'block' : 'none';
+        }
+
+        // Run on page load in case the form is re-rendered with errors and the checkbox was already checked
+        toggleSteamId();
+
+        onSteamCheckbox.addEventListener('change', toggleSteamId);
+    </script>
 
 </body>
 </html>
