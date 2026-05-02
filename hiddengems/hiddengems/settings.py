@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import sys
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 from dotenv import load_dotenv
@@ -128,11 +129,9 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000"
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
-# Rate limiting — lock after 5 failed login attempts for 1 hour
-AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = 1
-
 # Security headers — only active in production
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "https://localhost:3000").split(",")
+
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -145,6 +144,10 @@ if not DEBUG:
 if not DEBUG and os.getenv('SECURE_SSL', 'False') == 'True':
     SECURE_SSL_REDIRECT = True
 
-import sys
 if 'test' in sys.argv:
     AXES_ENABLED = False
+    SECURE_HSTS_PRELOAD = True
+    
+AXES_FAILURE_LIMIT = 5      # Lock after 5 failures
+AXES_COOLOFF_TIME = 1       # Lock for 1 hour
+AXES_LOCKOUT_CALLABLE = 'home.views.lockout_response'

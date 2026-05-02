@@ -9,6 +9,7 @@ distro==1.9.0
 dj-database-url==3.1.2
 Django==6.0.4
 django-admin==2.0.2
+django-axes==8.3.1
 django-excel-response2==3.0.6
 django-six==1.0.5
 excel-base==1.0.4
