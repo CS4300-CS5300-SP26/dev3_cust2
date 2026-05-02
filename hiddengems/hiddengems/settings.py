@@ -136,16 +136,22 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_URL = '/'
 
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
-# ── ADD THESE LINES to the bottom of your existing settings.py ──
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "https://localhost:3000").split(",")
 
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-]
+# Security settings — only enforce HTTPS-dependent headers in production
+SECURE_CONTENT_TYPE_NOSNIFF = True  # safe in all environments
 
-#Ai code review suggested removing this, i had to re-add it to get demos to work
-# Django's default X-Frame-Options is DENY, which blocks iframes loading
-# media files served from the same origin. SAMEORIGIN allows it.
-#X_FRAME_OPTIONS = 'SAMEORIGIN'
-#SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+INSTALLED_APPS += ['axes']
+MIDDLEWARE += ['axes.middleware.AxesMiddleware']
+AUTHENTICATION_BACKENDS = ['axes.backends.AxesStandaloneBackend', 'django.contrib.auth.backends.ModelBackend']
+AXES_FAILURE_LIMIT = 5      # Lock after 5 failures
+AXES_COOLOFF_TIME = 1       # Lock for 1 hour
+AXES_LOCKOUT_CALLABLE = 'home.views.lockout_response'
