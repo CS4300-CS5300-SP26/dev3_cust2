@@ -1,7 +1,7 @@
 import json
 import os
 
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from openai import OpenAI
 
 from .forms import GameUploadForm
-from .models import Game
+from .models import Game, Rating
 from .utils import get_similar_games
 
 
@@ -166,9 +166,19 @@ def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
     similar_games = get_similar_games(game)
 
+    # Average rating for this game
+    avg_rating = game.ratings.aggregate(Avg("score"))["score__avg"]
+
+    # Current user's rating (if logged in)
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(user=request.user, game=game).first()
+
     return render(request, "game_detail.html", {
         "game": game,  # Pass full game object — template accesses all fields via game.field
         "similar_games": similar_games,
+        "avg_rating": avg_rating,
+        "user_rating": user_rating,
     })
 
 
@@ -206,4 +216,22 @@ def user_page(request, username):
     return render(request, "user.html", {
         "favorites": favorites,
         "profile_user": user_obj,
+    })
+
+
+@login_required
+def rate_game(request, game_id):
+    game = get_object_or_404(Game, id=game_id)
+    score = int(request.POST.get("score"))
+
+    rating, created = Rating.objects.update_or_create(
+        user=request.user,
+        game=game,
+        defaults={"score": score}
+    )
+
+    return JsonResponse({
+        "status": "ok",
+        "score": score,
+        "average": game.ratings.aggregate(Avg("score"))["score__avg"]
     })

@@ -25,6 +25,8 @@ urlpatterns = [
     path("favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"),
 
     path("user/<str:username>/", views.user_page, name="user_page"),
+
+    path("rate/<int:game_id>/", views.rate_game, name="rate_game")
 ]
 
 if settings.DEBUG:
