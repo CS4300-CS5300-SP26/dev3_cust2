@@ -16,13 +16,17 @@ urlpatterns = [
     # Accessible at: /upload/
     path('upload/', views.upload_game, name='upload_game'),
 
-    # Game purchase page accessed by game ID (must come before slug pattern)
-    path('game/<int:game_id>/', views.purchase_game, name='purchase_game'),
+    # Game detail page accessed by slug
+    path("game/<slug:slug>/", views.game_detail, name="game_detail"),
 
     # Game detail page accessed by slug
     path("game/<slug:slug>/", views.game_detail, name="game_detail"),
 
-    path("admin/", admin.site.urls),
+    path("favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"),
+
+    path("user/<str:username>/", views.user_page, name="user_page"),
+
+    path("rate/<int:game_id>/", views.rate_game, name="rate_game")
 ]
 
 if settings.DEBUG:

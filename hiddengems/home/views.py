@@ -1,17 +1,20 @@
 import json
 import os
 
-from django.core.cache import cache
-from django.db.models import Q
-from django.http import HttpResponse
+from django.db.models import Q, Avg
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.core.cache import cache
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from openai import OpenAI
 
 from .forms import GameUploadForm
-from .models import CANONICAL_GENRES, Game, GenreTag
+from .models import CANONICAL_GENRES, Game, GenreTag, Rating
 from .utils import get_similar_games
 
 
@@ -315,9 +318,19 @@ def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
     similar_games = get_similar_games(game)
 
+    # Average rating for this game
+    avg_rating = game.ratings.aggregate(Avg("score"))["score__avg"]
+
+    # Current user's rating (if logged in)
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(user=request.user, game=game).first()
+
     return render(request, "game_detail.html", {
         "game": game,  # Pass full game object — template accesses all fields via game.field
         "similar_games": similar_games,
+        "avg_rating": avg_rating,
+        "user_rating": user_rating,
     })
 
 
@@ -328,4 +341,49 @@ def purchase_game(request, game_id):
         "storefront": game.storefront,
         "price": game.price,
         "game_id": game.game_id,
+    })
+
+
+@login_required
+def toggle_favorite(request, game_id):
+    print("GAME ID RECEIVED:", game_id)
+    game = get_object_or_404(Game, id=game_id)
+    profile = request.user.profile
+
+    if game in profile.favorites.all():
+        profile.favorites.remove(game)
+        status = "removed"
+    else:
+        profile.favorites.add(game)
+        status = "added"
+
+    return JsonResponse({"status": status})
+
+
+@login_required
+def user_page(request, username):
+    user_obj = get_object_or_404(User, username=username)
+    favorites = user_obj.profile.favorites.all()
+
+    return render(request, "user.html", {
+        "favorites": favorites,
+        "profile_user": user_obj,
+    })
+
+
+@login_required
+def rate_game(request, game_id):
+    game = get_object_or_404(Game, id=game_id)
+    score = int(request.POST.get("score"))
+
+    rating, created = Rating.objects.update_or_create(
+        user=request.user,
+        game=game,
+        defaults={"score": score}
+    )
+
+    return JsonResponse({
+        "status": "ok",
+        "score": score,
+        "average": game.ratings.aggregate(Avg("score"))["score__avg"]
     })
