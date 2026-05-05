@@ -148,7 +148,10 @@
           <span class="text-light btn-sm">Hi, {{ user.username }}</span>
           <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Submit a Game</a>
           <a href="{% url 'user_page' user.username %}" class="btn btn-outline-light btn-sm">Favorites</a>
-          <a href="/accounts/logout/" class="btn btn-outline-light btn-sm">Logout</a>
+          <form method="post" action="{% url 'logout' %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+          </form>
         {% else %}
           <a href="{% url 'upload_game' %}" class="btn btn-outline-light btn-sm">Submit a Game</a>
           <a href="/accounts/signup/" class="btn btn-light btn-sm">Sign Up</a>
