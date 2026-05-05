@@ -37,7 +37,7 @@ def signup_view(request):
             # Save the new user
             user = form.save()
             # Log them in immediately after signup
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('index')
     else:
         # Show empty signup form
