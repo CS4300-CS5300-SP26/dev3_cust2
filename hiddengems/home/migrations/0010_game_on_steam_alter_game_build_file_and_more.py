@@ -37,7 +37,8 @@ class Migration(migrations.Migration):
                 upload_to="game_thumbnails/",
                 validators=[
                     django.core.validators.FileExtensionValidator(
-                        allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"]
+                        allowed_extensions=[
+                            "jpg", "jpeg", "png", "gif", "webp"]
                     )
                 ],
             ),

@@ -28,43 +28,67 @@ class GameDetailTests(TestCase):
 
     def test_game_detail_page_loads(self):
         # Game detail page should load with a valid slug
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertEqual(response.status_code, 200)
 
     def test_game_detail_shows_title(self):
         # Title should appear on the game detail page
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertContains(response, "Test Game")
 
     def test_game_detail_shows_description(self):
         # Description should appear on the game detail page
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertContains(response, "A great game about testing")
 
     def test_game_detail_shows_price(self):
         # Price should appear on the game detail page
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertContains(response, "19.99")
 
     def test_game_detail_shows_developer(self):
         # Developer should appear on the game detail page
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertContains(response, "Test Dev")
 
     def test_game_detail_shows_publisher(self):
         # Publisher should appear on the game detail page
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertContains(response, "Test Publisher")
 
     def test_game_detail_loads_without_login(self):
         # Game detail page should be accessible without login
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertEqual(response.status_code, 200)
 
     def test_game_detail_loads_when_authenticated(self):
         # Game detail page should also work when logged in
         self.client.login(username="testuser", password="testpass123")
-        response = self.client.get(reverse("game_detail", args=[self.game.slug]))
+        response = self.client.get(
+            reverse(
+                "game_detail", args=[
+                    self.game.slug]))
         self.assertEqual(response.status_code, 200)
 
     def test_slug_auto_generated(self):
@@ -84,7 +108,10 @@ class GameDetailTests(TestCase):
 
     def test_game_detail_404_on_bad_slug(self):
         # Invalid slug should return 404
-        response = self.client.get(reverse("game_detail", args=["nonexistent-slug"]))
+        response = self.client.get(
+            reverse(
+                "game_detail",
+                args=["nonexistent-slug"]))
         self.assertEqual(response.status_code, 404)
 
 
@@ -104,22 +131,34 @@ class PurchaseGameTests(TestCase):
 
     def test_purchase_page_loads(self):
         # Purchase page should load with a valid game_id
-        response = self.client.get(reverse("purchase_game", args=[self.game.game_id]))
+        response = self.client.get(
+            reverse(
+                "purchase_game", args=[
+                    self.game.game_id]))
         self.assertEqual(response.status_code, 200)
 
     def test_purchase_page_shows_price(self):
         # Price should appear on the purchase page
-        response = self.client.get(reverse("purchase_game", args=[self.game.game_id]))
+        response = self.client.get(
+            reverse(
+                "purchase_game", args=[
+                    self.game.game_id]))
         self.assertContains(response, "29.99")
 
     def test_purchase_page_shows_storefront(self):
         # Storefront should appear on the purchase page
-        response = self.client.get(reverse("purchase_game", args=[self.game.game_id]))
+        response = self.client.get(
+            reverse(
+                "purchase_game", args=[
+                    self.game.game_id]))
         self.assertContains(response, "steam")
 
     def test_purchase_page_loads_without_login(self):
         # Purchase page should be accessible without login
-        response = self.client.get(reverse("purchase_game", args=[self.game.game_id]))
+        response = self.client.get(
+            reverse(
+                "purchase_game", args=[
+                    self.game.game_id]))
         self.assertEqual(response.status_code, 200)
 
     # --- Sad path ---

@@ -184,7 +184,8 @@ class UploadGameGenreTaggingTests(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username="uploader", password="pass")
+        self.user = User.objects.create_user(
+            username="uploader", password="pass")
         self.client.login(username="uploader", password="pass")
         self.upload_url = reverse("upload_game")
 

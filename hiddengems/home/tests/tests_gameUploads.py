@@ -10,7 +10,8 @@ class GameUploadSadPathTests(TestCase):
     def setUp(self):
         # Create a test user and log them in before each test
         self.client = Client()
-        self.user = User.objects.create_user(username="testdev", password="testpass123")
+        self.user = User.objects.create_user(
+            username="testdev", password="testpass123")
         self.client.login(username="testdev", password="testpass123")
         self.upload_url = reverse("upload_game")
 
@@ -137,7 +138,8 @@ class GameUploadSadPathTests(TestCase):
 
     def test_sql_injection_in_title(self):
         # Django's ORM safely parameterizes queries — SQL injection is not possible.
-        # The game saves normally; the important thing is the DB table still exists.
+        # The game saves normally; the important thing is the DB table still
+        # exists.
         response = self.client.post(
             self.upload_url,
             {
@@ -165,9 +167,11 @@ class GameUploadSadPathTests(TestCase):
                 "genre": "RPG",
             },
         )
-        # Django stores the raw string and auto-escapes it on render - the data is safe
+        # Django stores the raw string and auto-escapes it on render - the data
+        # is safe
         self.assertTrue(
-            Game.objects.filter(description='<script>alert("hacked")</script>').exists()
+            Game.objects.filter(
+                description='<script>alert("hacked")</script>').exists()
         )
 
     def test_unauthenticated_upload(self):

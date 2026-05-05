@@ -61,7 +61,8 @@ class AiParseQueryTests(TestCase):
         self.assertIn("puzzle", result["keywords"])
 
     @patch("home.views.OpenAI")
-    def test_strips_bare_code_fences_without_language_tag(self, mock_openai_cls):
+    def test_strips_bare_code_fences_without_language_tag(
+            self, mock_openai_cls):
         payload = '```\n{"keywords": ["rpg"], "vibe_keywords": [], "genre": "RPG", "free_only": false, "max_price": null}\n```'
         mock_openai_cls.return_value.responses.create.return_value = (
             self._mock_response(payload)
@@ -220,7 +221,9 @@ class BrowseAiSearchTests(TestCase):
         # keyword matches horror game; genre matches rpg — both should appear
         ai_result = make_ai_response(keywords=["terrifying"], genre="RPG")
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "terrifying rpg"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "terrifying rpg"})
 
         titles = [g.title for g in response.context["games"]]
         self.assertIn("Shadow Depths", titles)
@@ -243,7 +246,9 @@ class BrowseAiSearchTests(TestCase):
     def test_max_price_filter_excludes_expensive_games(self):
         ai_result = make_ai_response(max_price=5)
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "games under $5"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "games under $5"})
 
         games = list(response.context["games"])
         for game in games:
@@ -254,7 +259,8 @@ class BrowseAiSearchTests(TestCase):
         self.assertNotIn("Epic Quest", titles)
 
     def test_free_only_takes_precedence_over_max_price(self):
-        # When free_only is true, only $0 games returned regardless of max_price
+        # When free_only is true, only $0 games returned regardless of
+        # max_price
         ai_result = make_ai_response(free_only=True, max_price=10)
         with self._patch_ai(ai_result):
             response = self.client.get(self.browse_url, {"q": "free"})
@@ -266,7 +272,8 @@ class BrowseAiSearchTests(TestCase):
     # --- No filters / empty results ---
 
     def test_no_filters_returns_all_games(self):
-        # AI returns empty filters → all games returned (price filter already applied: none)
+        # AI returns empty filters → all games returned (price filter already
+        # applied: none)
         ai_result = make_ai_response()
         with self._patch_ai(ai_result):
             response = self.client.get(self.browse_url, {"q": "anything"})
@@ -276,7 +283,9 @@ class BrowseAiSearchTests(TestCase):
     def test_query_with_no_matching_games_returns_empty(self):
         ai_result = make_ai_response(keywords=["xyznonexistent"])
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "xyznonexistent"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "xyznonexistent"})
 
         self.assertEqual(len(response.context["games"]), 0)
 

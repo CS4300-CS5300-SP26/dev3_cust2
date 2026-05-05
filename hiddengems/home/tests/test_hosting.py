@@ -9,7 +9,8 @@ class GameModelSadPathTests(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username="testdev", password="testpass123")
+        self.user = User.objects.create_user(
+            username="testdev", password="testpass123")
 
     # --- Slug edge cases ---
 
@@ -40,7 +41,10 @@ class GameModelSadPathTests(TestCase):
 
     def test_game_str_returns_title(self):
         # __str__ should return the game title
-        game = Game.objects.create(title="My Game", description="desc", price="9.99")
+        game = Game.objects.create(
+            title="My Game",
+            description="desc",
+            price="9.99")
         self.assertEqual(str(game), "My Game")
 
     def test_developer_field_can_be_blank(self):
@@ -66,7 +70,10 @@ class GameModelSadPathTests(TestCase):
 
     def test_game_id_can_be_null(self):
         # game_id is optional and can be null
-        game = Game.objects.create(title="No ID Game", description="desc", price="9.99")
+        game = Game.objects.create(
+            title="No ID Game",
+            description="desc",
+            price="9.99")
         self.assertIsNone(game.game_id)
 
     def test_storefront_defaults_to_steam(self):
@@ -94,7 +101,8 @@ class GameModelSadPathTests(TestCase):
 
     def test_authorized_users_can_have_multiple(self):
         # Multiple users can be authorized for the same game
-        user2 = User.objects.create_user(username="otherdev", password="testpass123")
+        user2 = User.objects.create_user(
+            username="otherdev", password="testpass123")
         game = Game.objects.create(
             title="Collab Game", description="desc", price="9.99"
         )

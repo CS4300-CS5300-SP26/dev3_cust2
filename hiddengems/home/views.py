@@ -137,7 +137,8 @@ def _ai_tag_game(game):
                 "role": "system",
                 "content": (
                     "You are a game genre classifier. Given a game's info, assign 1–3 genre tags "
-                    "from this exact list: " + ", ".join(CANONICAL_GENRES) + ".\n\n"
+                    "from this exact list: " +
+                        ", ".join(CANONICAL_GENRES) + ".\n\n"
                     'Respond with ONLY a JSON array of strings, e.g. ["Action", "RPG"]. '
                     "Pick only genres that clearly fit. Use fewer, accurate tags over many."
                 ),
@@ -182,7 +183,8 @@ def index(request):
 # View that handles the game upload page
 def upload_game(request):
 
-    # Redirect unauthenticated users to login page, then back to upload after login
+    # Redirect unauthenticated users to login page, then back to upload after
+    # login
     if not request.user.is_authenticated:
         return redirect(f"/accounts/login/?next=/upload/")
 
@@ -208,7 +210,8 @@ def upload_game(request):
             # Save the game to the database
             game.save()
 
-            # Auto-assign AI genre tags (best-effort — don't fail upload on error)
+            # Auto-assign AI genre tags (best-effort — don't fail upload on
+            # error)
             try:
                 _ai_tag_game(game)
             except Exception as e:
@@ -306,7 +309,8 @@ def browse(request):
 
             # Apply text + genre filters. Combine them with OR so that a game
             # matching the vibe OR the genre qualifies — this avoids zero results
-            # when genre tags in the DB don't perfectly match the AI's genre label.
+            # when genre tags in the DB don't perfectly match the AI's genre
+            # label.
             if all_terms and genre:
                 games = games.filter(
                     text_filter
@@ -317,7 +321,8 @@ def browse(request):
                 games = games.filter(text_filter)
             elif genre:
                 games = games.filter(
-                    Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)
+                    Q(genre__icontains=genre) | Q(
+                        genre_tags__name__icontains=genre)
                 ).distinct()
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
@@ -357,7 +362,8 @@ def game_detail(request, slug):
     # Current user's rating (if logged in)
     user_rating = None
     if request.user.is_authenticated:
-        user_rating = Rating.objects.filter(user=request.user, game=game).first()
+        user_rating = Rating.objects.filter(
+            user=request.user, game=game).first()
 
     return render(
         request,

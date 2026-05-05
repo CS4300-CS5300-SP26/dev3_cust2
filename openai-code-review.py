@@ -58,7 +58,8 @@ with open("diff.txt", "r") as file:
 """ Assign the OpenAI API key to a variable """
 openai_key = os.getenv("OPENAI_API_KEY")
 if not openai_key:
-    raise ValueError("No API key found. Set the OPENAI_API_KEY environment variable.")
+    raise ValueError(
+        "No API key found. Set the OPENAI_API_KEY environment variable.")
 
 
 """ Query ChatGPT for a client """
@@ -91,7 +92,7 @@ input_content = f"""
 
     If possible, also provide an evaluation matrix on style, security, code
     efficiency, architectural stability, and Software Engineering standards so
-    the student can pinpoint exact areas of concern. Don't provide a 
+    the student can pinpoint exact areas of concern. Don't provide a
     grade/score, but provide a rating with categories like "Needs Fix, Minor,
     Moderate, and Good".
 
@@ -144,9 +145,9 @@ except openai.RateLimitError as e:
 
 """ Remove any leading file details if present using list slicing """
 if feedback_message.startswith("```markdown"):
-    feedback_message = feedback_message[len("```markdown") :]
+    feedback_message = feedback_message[len("```markdown"):]
 elif feedback_message.startswith(FENCE):
-    feedback_message = feedback_message[len(FENCE) :]
+    feedback_message = feedback_message[len(FENCE):]
 
 
 """ Remove trailing code fence if present """

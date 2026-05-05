@@ -6,7 +6,8 @@ from home.models import Game
 @given("I am a logged in user")
 def step_logged_in(context):
     # Create a test user and log them in
-    context.user = User.objects.create_user(username="testdev", password="testpass123")
+    context.user = User.objects.create_user(
+        username="testdev", password="testpass123")
     context.client.login(username="testdev", password="testpass123")
 
 

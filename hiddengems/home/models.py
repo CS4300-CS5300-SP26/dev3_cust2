@@ -72,7 +72,8 @@ class Game(models.Model):
     # Genre of the game (RPG, puzzle, platformer, etc.)
     genre = models.CharField(max_length=100, blank=True)
     # AI-assigned genre tags (M2M, populated automatically on upload)
-    genre_tags = models.ManyToManyField(GenreTag, blank=True, related_name="games")
+    genre_tags = models.ManyToManyField(
+        GenreTag, blank=True, related_name="games")
     # Indicates if the game can run directly in the browser
     playable_in_browser = models.BooleanField(default=False)
     # Other platforms the game is available on (Steam, itch.io, etc.)
@@ -93,11 +94,15 @@ class Game(models.Model):
     build_file = models.FileField(
         upload_to="game_builds/",
         blank=True,
-        validators=[FileExtensionValidator(allowed_extensions=["zip", "wasm"])],
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[
+                    "zip", "wasm"])],
     )
 
     # Steam Integration
-    on_steam = models.BooleanField(default=False)  # Whether the game is listed on Steam
+    # Whether the game is listed on Steam
+    on_steam = models.BooleanField(default=False)
     storefront = models.CharField(max_length=50, default="steam")
     game_id = models.IntegerField(null=True, blank=True)
 
@@ -123,7 +128,8 @@ class Game(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    favorites = models.ManyToManyField(Game, blank=True, related_name="favorited_by")
+    favorites = models.ManyToManyField(
+        Game, blank=True, related_name="favorited_by")
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -131,7 +137,10 @@ class Profile(models.Model):
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="ratings")
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.CASCADE,
+        related_name="ratings")
     score = models.PositiveSmallIntegerField()  # 1–5
 
     class Meta:

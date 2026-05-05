@@ -61,4 +61,7 @@ class RatingTests(TestCase):
         response = self.client.post(self.rate_url, {"score": 99})
 
         # Should not create a rating
-        self.assertFalse(Rating.objects.filter(user=self.user, game=self.game).exists())
+        self.assertFalse(
+            Rating.objects.filter(
+                user=self.user,
+                game=self.game).exists())

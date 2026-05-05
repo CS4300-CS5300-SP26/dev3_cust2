@@ -33,7 +33,8 @@ class Migration(migrations.Migration):
                 ("playable_in_browser", models.BooleanField(default=False)),
                 ("other_platforms", models.CharField(blank=True, max_length=200)),
                 ("thumbnail", models.FileField(upload_to="game_thumbnails/")),
-                ("build_file", models.FileField(blank=True, upload_to="game_builds/")),
+                ("build_file", models.FileField(
+                    blank=True, upload_to="game_builds/")),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "developer",

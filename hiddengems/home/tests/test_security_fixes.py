@@ -22,9 +22,10 @@ import io
 import sys
 import requests
 
-# ── CLI args ──────────────────────────────────────────────────────────────────
+# ── CLI args ────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="HiddenGems security fix tests")
+    parser = argparse.ArgumentParser(
+        description="HiddenGems security fix tests")
     parser.add_argument(
         "--base-url",
         default="http://localhost:8000",
@@ -45,7 +46,7 @@ else:
     USERNAME = "testuser"
     PASSWORD = "testpass123"
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ── Helpers ─────────────────────────────────────────────────────────────
 PASS = "\033[92m[PASS]\033[0m"
 FAIL = "\033[91m[FAIL]\033[0m"
 INFO = "\033[94m[INFO]\033[0m"
@@ -102,12 +103,12 @@ def upload_file(session, filename, content, content_type, extra_fields=None):
     )
 
 
-# ── Tests ─────────────────────────────────────────────────────────────────────
+# ── Tests ───────────────────────────────────────────────────────────────
 
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"  HiddenGems Security Fix Tests")
 print(f"  Target: {BASE}")
-print(f"{'='*60}\n")
+print(f"{'=' * 60}\n")
 
 # ── Test 1: Block HTML build file upload ─────────────────────────────────────
 print("TEST 1 — HTML build file upload should be blocked")
@@ -158,7 +159,11 @@ else:
     <svg xmlns="http://www.w3.org/2000/svg">
       <script>alert(document.cookie)</script>
     </svg>"""
-    files = {"thumbnail": ("evil.svg", io.BytesIO(malicious_svg), "image/svg+xml")}
+    files = {
+        "thumbnail": (
+            "evil.svg",
+            io.BytesIO(malicious_svg),
+            "image/svg+xml")}
     data = {
         "title": "SVG Test Game",
         "description": "Security test",
@@ -198,7 +203,11 @@ else:
     if resp3.url and "/game/" in resp3.url:
         page = s3.get(resp3.url)
         has_sandbox = "sandbox=" in page.text or 'sandbox"' in page.text
-        result("iframe sandbox attribute present", has_sandbox, f"Checked: {resp3.url}")
+        result(
+            "iframe sandbox attribute present",
+            has_sandbox,
+            f"Checked: {
+                resp3.url}")
     else:
         # Check browse page for any game with playable_in_browser
         browse = s3.get(f"{BASE}/browse/")
@@ -239,9 +248,12 @@ resp4 = s4.post(
 
 location = resp4.headers.get("Location", "")
 redirect_blocked = "attacker.example.com" not in location
-result("Open redirect blocked", redirect_blocked, f"Redirect location: '{location}'")
+result(
+    "Open redirect blocked",
+    redirect_blocked,
+    f"Redirect location: '{location}'")
 
-# ── Test 5: Logout requires POST (GET should not log out) ─────────────────────
+# ── Test 5: Logout requires POST (GET should not log out) ───────────────
 print("\nTEST 5 — GET /accounts/logout/ should NOT log user out")
 s5 = requests.Session()
 login(s5)
@@ -260,7 +272,8 @@ still_logged_in = check_after.status_code == 200
 result(
     "GET logout does not log user out (CSRF fix)",
     still_logged_in,
-    f"Before GET logout — upload accessible: {logged_in_before}  |  After: {check_after.status_code}",
+    f"Before GET logout — upload accessible: {logged_in_before}  |  After: {
+        check_after.status_code}",
 )
 
 # Bonus: confirm POST logout DOES work
@@ -278,10 +291,11 @@ post_logout_works = check_after_post.status_code in (302, 301)
 result(
     "POST logout works correctly",
     post_logout_works,
-    f"Upload after POST logout: {check_after_post.status_code} (expect 302 redirect)",
+    f"Upload after POST logout: {
+        check_after_post.status_code} (expect 302 redirect)",
 )
 
-# ── Test 6: Rate limiting (django-axes) ───────────────────────────────────────
+# ── Test 6: Rate limiting (django-axes) ─────────────────────────────────
 print("\nTEST 6 — 5 failed logins should trigger account lockout")
 s6 = requests.Session()
 login_url = f"{BASE}/accounts/login/"
@@ -308,7 +322,7 @@ for i in range(6):
         or "account locked" in resp.text.lower()
     ):
         locked = True
-        print(f"  {INFO} Locked out after {i+1} attempt(s)")
+        print(f"  {INFO} Locked out after {i + 1} attempt(s)")
         break
 
 result(
@@ -317,10 +331,10 @@ result(
     "Expected lockout within 6 attempts (axes AXES_FAILURE_LIMIT=5)",
 )
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-print(f"\n{'='*60}")
+# ── Summary ─────────────────────────────────────────────────────────────
+print(f"\n{'=' * 60}")
 print("  SUMMARY")
-print(f"{'='*60}")
+print(f"{'=' * 60}")
 passed = sum(1 for _, p in results if p is True)
 failed = sum(1 for _, p in results if p is False)
 skipped = sum(1 for _, p in results if p is None)
@@ -334,7 +348,7 @@ for name, p in results:
         print(f"  \033[93m[SKIP]\033[0m {name}")
 
 print(f"\n  Passed: {passed}  Failed: {failed}  Skipped: {skipped}")
-print(f"{'='*60}\n")
+print(f"{'=' * 60}\n")
 
 if failed > 0:
     sys.exit(1)

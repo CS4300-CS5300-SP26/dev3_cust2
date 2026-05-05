@@ -10,7 +10,8 @@ class BrowserPlayableGameTests(TestCase):
     def setUp(self):
         # Create a test user and log them in before each test
         self.client = Client()
-        self.user = User.objects.create_user(username="testdev", password="testpass123")
+        self.user = User.objects.create_user(
+            username="testdev", password="testpass123")
         self.client.login(username="testdev", password="testpass123")
         self.upload_url = reverse("upload_game")
 
@@ -89,7 +90,8 @@ class BrowserPlayableGameTests(TestCase):
         self.assertContains(response, "My Awesome Game")
 
     def test_game_detail_shows_play_demo_when_playable(self):
-        # Play Demo section should appear when game is browser playable with a build file
+        # Play Demo section should appear when game is browser playable with a
+        # build file
         build = SimpleUploadedFile(
             "game.html", b"<html><body>Game</body></html>", content_type="text/html"
         )
@@ -121,7 +123,8 @@ class BrowserPlayableGameTests(TestCase):
         self.assertNotContains(response, "Play Demo in Browser")
 
     def test_game_detail_hides_play_demo_when_no_build_file(self):
-        # Play Demo section should NOT appear when playable_in_browser is True but no build file
+        # Play Demo section should NOT appear when playable_in_browser is True
+        # but no build file
         game = Game.objects.create(
             title="No Build Game",
             description="Marked playable but no file",
@@ -156,7 +159,10 @@ class BrowserPlayableGameTests(TestCase):
 
     def test_game_detail_404_for_invalid_slug(self):
         # Should return 404 for a slug that doesn't exist
-        response = self.client.get(reverse("game_detail", args=["nonexistent-game"]))
+        response = self.client.get(
+            reverse(
+                "game_detail",
+                args=["nonexistent-game"]))
         self.assertEqual(response.status_code, 404)
 
     def test_upload_playable_game_without_build_file(self):

@@ -46,14 +46,18 @@ class GameToTextTestCase(TestCase):
 
 class TitleSimilarityBoostTestCase(TestCase):
     def test_exact_match(self):
-        self.assertEqual(util.title_similarity_boost("Factorio", "Factorio"), 1.3)
+        self.assertEqual(
+            util.title_similarity_boost(
+                "Factorio", "Factorio"), 1.3)
 
     def test_subset_title(self):
         boost = util.title_similarity_boost("Factorio", "Factorio: Space Age")
         self.assertGreater(boost, 0)
 
     def test_no_match(self):
-        self.assertEqual(util.title_similarity_boost("Factorio", "Dragon Quest"), 0.0)
+        self.assertEqual(
+            util.title_similarity_boost(
+                "Factorio", "Dragon Quest"), 0.0)
 
     def test_strips_punctuation(self):
         boost = util.title_similarity_boost("Half-Life", "Half-Life: Source")
@@ -83,18 +87,21 @@ class PublisherDeveloperBoostTestCase(TestCase):
 
     def test_both_match(self):
         self.assertEqual(
-            util.publisher_developer_boost(self.base_game, self.similar_game), 0.4
+            util.publisher_developer_boost(
+                self.base_game, self.similar_game), 0.4
         )
 
     def test_publisher_only(self):
         self.unrelated_game.publisher = "Wube Software LTD."
         self.assertEqual(
-            util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.2
+            util.publisher_developer_boost(
+                self.base_game, self.unrelated_game), 0.2
         )
 
     def test_no_match(self):
         self.assertEqual(
-            util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.0
+            util.publisher_developer_boost(
+                self.base_game, self.unrelated_game), 0.0
         )
 
 
@@ -162,7 +169,9 @@ class GetSimilarGamesTestCase(TestCase):
 
     def test_stores_in_db(self):
         util.get_similar_games(self.base_game)
-        self.assertTrue(SimilarGame.objects.filter(game=self.base_game).exists())
+        self.assertTrue(
+            SimilarGame.objects.filter(
+                game=self.base_game).exists())
 
     def test_empty_db(self):
         # Only base_game exists — no other games to be similar to
