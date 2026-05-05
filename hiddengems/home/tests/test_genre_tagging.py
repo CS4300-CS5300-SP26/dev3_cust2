@@ -1,6 +1,5 @@
-import json
 from io import StringIO
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -8,7 +7,7 @@ from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from home.models import CANONICAL_GENRES, Game, GenreTag
+from home.models import Game, GenreTag
 from home.views import _ai_tag_game
 
 

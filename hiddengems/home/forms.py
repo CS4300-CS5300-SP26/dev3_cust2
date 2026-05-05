@@ -1,9 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import FileExtensionValidator  # add to imports
 import decimal
 from .models import Game
-from django.core.validators import FileExtensionValidator  # add to imports
 
 
 # Form used by developers to upload a new game
@@ -87,8 +87,6 @@ class GameUploadForm(forms.ModelForm):
         if commit:
             game.save()
         return game
-
-    from django.core.validators import FileExtensionValidator  # add to imports
 
     # Inside class Meta, update the model fields in models.py instead,
     # but you can also add clean methods here in forms.py:

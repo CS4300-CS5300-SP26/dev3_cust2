@@ -1,7 +1,7 @@
 # Ignore Python bytecode directories and files
 __pycache__/
 *.pyc
-venv/
+.venv/
 db.sqlite3
 
 # Ignore SSH and env keys if present

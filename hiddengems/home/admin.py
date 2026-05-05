@@ -1,9 +1,7 @@
 import json
-import os
 from decimal import Decimal
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from urllib.parse import urlencode
 
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
@@ -11,8 +9,6 @@ from django.shortcuts import render
 from django.urls import path, reverse
 
 from .models import Game
-
-from django.conf import settings
 
 
 @admin.register(Game)
