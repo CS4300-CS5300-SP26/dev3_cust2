@@ -7,23 +7,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0009_merge_20260420_2333'),
+        ("home", "0009_merge_20260420_2333"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='game',
-            name='on_steam',
+            model_name="game",
+            name="on_steam",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='game',
-            name='build_file',
-            field=models.FileField(blank=True, upload_to='game_builds/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['zip', 'wasm'])]),
+            model_name="game",
+            name="build_file",
+            field=models.FileField(
+                blank=True,
+                upload_to="game_builds/",
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["zip", "wasm"]
+                    )
+                ],
+            ),
         ),
         migrations.AlterField(
-            model_name='game',
-            name='thumbnail',
-            field=models.FileField(blank=True, upload_to='game_thumbnails/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]),
+            model_name="game",
+            name="thumbnail",
+            field=models.FileField(
+                blank=True,
+                upload_to="game_thumbnails/",
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"]
+                    )
+                ],
+            ),
         ),
     ]

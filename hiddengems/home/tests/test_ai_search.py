@@ -8,7 +8,9 @@ from home.models import Game
 from home.views import _ai_parse_query
 
 
-def make_ai_response(keywords=None, vibe_keywords=None, genre=None, free_only=False, max_price=None):
+def make_ai_response(
+    keywords=None, vibe_keywords=None, genre=None, free_only=False, max_price=None
+):
     """Helper that builds the dict _ai_parse_query returns."""
     return {
         "keywords": keywords or [],
@@ -23,6 +25,7 @@ def make_ai_response(keywords=None, vibe_keywords=None, genre=None, free_only=Fa
 # Unit tests for _ai_parse_query
 # ---------------------------------------------------------------------------
 
+
 class AiParseQueryTests(TestCase):
 
     def _mock_response(self, text):
@@ -34,7 +37,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_returns_parsed_json(self, mock_openai_cls):
         payload = '{"keywords": ["horror"], "vibe_keywords": ["dark"], "genre": "Horror", "free_only": false, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("scary horror game")
 
@@ -45,8 +50,10 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_strips_markdown_code_fences(self, mock_openai_cls):
-        payload = "```json\n{\"keywords\": [\"puzzle\"], \"vibe_keywords\": [], \"genre\": \"Puzzle\", \"free_only\": false, \"max_price\": null}\n```"
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        payload = '```json\n{"keywords": ["puzzle"], "vibe_keywords": [], "genre": "Puzzle", "free_only": false, "max_price": null}\n```'
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("puzzle game")
 
@@ -55,8 +62,10 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_strips_bare_code_fences_without_language_tag(self, mock_openai_cls):
-        payload = "```\n{\"keywords\": [\"rpg\"], \"vibe_keywords\": [], \"genre\": \"RPG\", \"free_only\": false, \"max_price\": null}\n```"
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        payload = '```\n{"keywords": ["rpg"], "vibe_keywords": [], "genre": "RPG", "free_only": false, "max_price": null}\n```'
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("rpg game")
 
@@ -65,7 +74,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_free_only_flag(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": [], "genre": null, "free_only": true, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("free games")
 
@@ -74,7 +85,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_max_price_parsed(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": [], "genre": null, "free_only": false, "max_price": 5}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("games under $5")
 
@@ -84,7 +97,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_vibe_keywords_returned(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": ["relaxing", "peaceful", "cozy"], "genre": null, "free_only": false, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("something relaxing")
 
@@ -93,14 +108,18 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_invalid_json(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response("not valid json at all")
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response("not valid json at all")
+        )
 
         with self.assertRaises(Exception):
             _ai_parse_query("some query")
 
     @patch("home.views.OpenAI")
     def test_raises_on_api_error(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError("API unavailable")
+        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError(
+            "API unavailable"
+        )
 
         with self.assertRaises(RuntimeError):
             _ai_parse_query("any query")
@@ -109,6 +128,7 @@ class AiParseQueryTests(TestCase):
 # ---------------------------------------------------------------------------
 # Integration tests for the browse view with AI search
 # ---------------------------------------------------------------------------
+
 
 class BrowseAiSearchTests(TestCase):
 

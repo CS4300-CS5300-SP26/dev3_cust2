@@ -15,7 +15,6 @@ from .models import Game
 from django.conf import settings
 
 
-
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     list_display = ("title", "publisher", "developer", "storefront", "game_id", "price")
@@ -38,7 +37,6 @@ class GameAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-
     def sync_update_all_view(self, request):
         if request.method == "POST":
             start_id = request.POST.get("start_id", "").strip()
@@ -52,7 +50,9 @@ class GameAdmin(admin.ModelAdmin):
             end_id = int(end_id)
 
             if start_id > end_id:
-                messages.error(request, "Start ID must be less than or equal to End ID.")
+                messages.error(
+                    request, "Start ID must be less than or equal to End ID."
+                )
                 return HttpResponseRedirect(reverse("admin:home_game_sync_update_all"))
 
             created_count = 0

@@ -7,26 +7,21 @@ from django.contrib import admin
 # URL patterns for the home app
 urlpatterns = [
     # Homepage
-    path('', views.index, name='index'),
-
+    path("", views.index, name="index"),
     # Browse/explore all games
-    path('browse/', views.browse, name='browse'),
-
+    path("browse/", views.browse, name="browse"),
     # Page where developers upload their games
     # Accessible at: /upload/
-    path('upload/', views.upload_game, name='upload_game'),
-
+    path("upload/", views.upload_game, name="upload_game"),
     # Game detail page accessed by slug
     path("game/<slug:slug>/", views.game_detail, name="game_detail"),
-
     # Game detail page accessed by slug
     path("game/<slug:slug>/", views.game_detail, name="game_detail"),
-
-    path("favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"),
-
+    path(
+        "favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"
+    ),
     path("user/<str:username>/", views.user_page, name="user_page"),
-
-    path("rate/<int:game_id>/", views.rate_game, name="rate_game")
+    path("rate/<int:game_id>/", views.rate_game, name="rate_game"),
 ]
 
 if settings.DEBUG:

@@ -13,7 +13,13 @@ from home.views import _ai_tag_game
 
 
 def _make_game(**kwargs):
-    defaults = dict(title="Test Game", description="A test game.", genre="", price="0.00", developer="Dev")
+    defaults = dict(
+        title="Test Game",
+        description="A test game.",
+        genre="",
+        price="0.00",
+        developer="Dev",
+    )
     defaults.update(kwargs)
     return Game.objects.create(**defaults)
 
@@ -28,11 +34,14 @@ def _mock_openai_response(text):
 # Unit tests for _ai_tag_game
 # ---------------------------------------------------------------------------
 
+
 class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_assigns_canonical_tags_to_game(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Action", "RPG"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Action", "RPG"]')
+        )
         game = _make_game(title="Hero Quest")
 
         _ai_tag_game(game)
@@ -43,7 +52,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_creates_genre_tag_objects(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Puzzle"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Puzzle"]')
+        )
         game = _make_game()
 
         _ai_tag_game(game)
@@ -52,7 +63,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_does_not_duplicate_existing_genre_tags(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Horror"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Horror"]')
+        )
         GenreTag.objects.create(name="Horror", slug="horror")
         game = _make_game()
 
@@ -62,7 +75,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_strips_non_canonical_genres(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Action", "NotAGenre", "FakeTag"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Action", "NotAGenre", "FakeTag"]')
+        )
         game = _make_game()
 
         _ai_tag_game(game)
@@ -74,7 +89,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_all_non_canonical_results_in_no_tags(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Fake1", "Fake2"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Fake1", "Fake2"]')
+        )
         game = _make_game()
 
         _ai_tag_game(game)
@@ -84,7 +101,9 @@ class AiTagGameTests(TestCase):
     @patch("home.views.OpenAI")
     def test_strips_markdown_code_fences(self, mock_openai_cls):
         payload = '```json\n["Strategy", "Simulation"]\n```'
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response(payload)
+        )
         game = _make_game()
 
         _ai_tag_game(game)
@@ -96,7 +115,9 @@ class AiTagGameTests(TestCase):
     @patch("home.views.OpenAI")
     def test_strips_bare_code_fences(self, mock_openai_cls):
         payload = '```\n["Platformer"]\n```'
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response(payload)
+        )
         game = _make_game()
 
         _ai_tag_game(game)
@@ -106,7 +127,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_invalidates_cache_for_each_tag(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Action", "RPG"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Action", "RPG"]')
+        )
         cache.set("genre_games_action", "stale")
         cache.set("genre_games_rpg", "stale")
         game = _make_game()
@@ -118,7 +141,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_invalid_json(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response("not json")
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response("not json")
+        )
         game = _make_game()
 
         with self.assertRaises(Exception):
@@ -126,7 +151,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_api_error(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError("API unavailable")
+        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError(
+            "API unavailable"
+        )
         game = _make_game()
 
         with self.assertRaises(RuntimeError):
@@ -134,7 +161,9 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_truncates_description_to_600_chars(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = _mock_openai_response('["Action"]')
+        mock_openai_cls.return_value.responses.create.return_value = (
+            _mock_openai_response('["Action"]')
+        )
         long_description = "x" * 1000
         game = _make_game(description=long_description)
 
@@ -150,6 +179,7 @@ class AiTagGameTests(TestCase):
 # Integration: upload_game view auto-tags and swallows errors
 # ---------------------------------------------------------------------------
 
+
 class UploadGameGenreTaggingTests(TestCase):
 
     def setUp(self):
@@ -159,11 +189,14 @@ class UploadGameGenreTaggingTests(TestCase):
         self.upload_url = reverse("upload_game")
 
     def _post_game(self, title="My Game"):
-        return self.client.post(self.upload_url, {
-            "title": title,
-            "description": "An awesome indie game.",
-            "price": "4.99",
-        })
+        return self.client.post(
+            self.upload_url,
+            {
+                "title": title,
+                "description": "An awesome indie game.",
+                "price": "4.99",
+            },
+        )
 
     @patch("home.views._ai_tag_game")
     def test_upload_calls_ai_tag_game(self, mock_tag):
@@ -180,6 +213,7 @@ class UploadGameGenreTaggingTests(TestCase):
 # ---------------------------------------------------------------------------
 # Management command: tag_genres
 # ---------------------------------------------------------------------------
+
 
 class TagGenresCommandTests(TestCase):
 
@@ -217,7 +251,10 @@ class TagGenresCommandTests(TestCase):
         mock_tag.assert_not_called()
         self.assertIn("already have genre tags", out.getvalue())
 
-    @patch("home.management.commands.tag_genres._ai_tag_game", side_effect=RuntimeError("fail"))
+    @patch(
+        "home.management.commands.tag_genres._ai_tag_game",
+        side_effect=RuntimeError("fail"),
+    )
     def test_failed_games_counted_in_output(self, mock_tag):
         _make_game(title="Game A")
         _make_game(title="Game B")

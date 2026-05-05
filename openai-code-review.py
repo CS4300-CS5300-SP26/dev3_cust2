@@ -1,24 +1,23 @@
 """
-    Contributed by Devin Haggitt
-    Modified March 16, 2026
+Contributed by Devin Haggitt
+Modified March 16, 2026
 
-    Function: This script will conduct an AI
-    code review for each pull request ran on the system.
+Function: This script will conduct an AI
+code review for each pull request ran on the system.
 
-    *** Currently limited to pull requests with diff files
-    under 15000 characters. Need to expand the functionality
-    for bigger pull requests to break up the diff file ***
+*** Currently limited to pull requests with diff files
+under 15000 characters. Need to expand the functionality
+for bigger pull requests to break up the diff file ***
 
-    Used https://github.com/UCCS-SP25-CS4300-CS5300-1/
-        Group-8-spring-2025/blob/main/ai-code-review.py
-    as a resource for constructing
+Used https://github.com/UCCS-SP25-CS4300-CS5300-1/
+    Group-8-spring-2025/blob/main/ai-code-review.py
+as a resource for constructing
 """
 
 import openai
 from openai import OpenAI
 import os
 import shutil
-
 
 """ Constants declared for efficiency """
 FENCE = "```"
@@ -30,9 +29,11 @@ secret_strings = ["KEY =", "KEY=", "TOKEN =", "TOKEN="]
 
 
 """ Function to remove potential secrets from diff """
+
+
 def scrub_diff(diff_file):
-    temp_file = diff_file + '.temp'
-    with open(diff_file, 'r') as infile, open(temp_file, 'w') as outfile:
+    temp_file = diff_file + ".temp"
+    with open(diff_file, "r") as infile, open(temp_file, "w") as outfile:
         for line in infile:
             if not any(s in line for s in secret_strings):
                 outfile.write(line)
@@ -43,7 +44,7 @@ def scrub_diff(diff_file):
 
 """ Read the diff """
 if not os.path.exists("diff.txt"):
-    raise RuntimeError('Failed to find diff file')
+    raise RuntimeError("Failed to find diff file")
 scrub_diff("diff.txt")
 with open("diff.txt", "r") as file:
     diff = file.read()
@@ -57,8 +58,7 @@ with open("diff.txt", "r") as file:
 """ Assign the OpenAI API key to a variable """
 openai_key = os.getenv("OPENAI_API_KEY")
 if not openai_key:
-    raise ValueError(
-        "No API key found. Set the OPENAI_API_KEY environment variable.")
+    raise ValueError("No API key found. Set the OPENAI_API_KEY environment variable.")
 
 
 """ Query ChatGPT for a client """
@@ -105,7 +105,7 @@ try:
     openai_chat = client.responses.create(
         model="gpt-5.1-codex-mini",
         instructions=instructions_content,
-        input=input_content
+        input=input_content,
     )
     feedback_message = openai_chat.output_text
     response_id = openai_chat.id
@@ -114,50 +114,45 @@ try:
 except openai.APITimeoutError as e:
     print(f"""OpenAI API request took too long to complete:
         {e}""")
-    feedback_message = (
-        f"""Open AI API request took too long to complete:
-        {e}""")
+    feedback_message = f"""Open AI API request took too long to complete:
+        {e}"""
 
 except openai.AuthenticationError as e:
     print(f"""OpenAI API request failed to authenticate the API Key:
         {e}""")
-    feedback_message = (
-        f"""Open AI API request failed to authenticate the API Key:
-        {e}""")
+    feedback_message = f"""Open AI API request failed to authenticate the API Key:
+        {e}"""
 
 except openai.BadRequestError as e:
     print(f"""OpenAI API request was malformed or is missing parameters:
         {e}""")
-    feedback_message = (
-        f"""Open AI API request was malformed or is missing parameters:
-        {e}""")
+    feedback_message = f"""Open AI API request was malformed or is missing parameters:
+        {e}"""
 
 except openai.InternalServerError as e:
     print(f"""OpenAI API request reached an Internal Server Error:
         {e}""")
-    feedback_message = (
-        f"""Open AI API request reached an Internal Server Error:
-        {e}""")
+    feedback_message = f"""Open AI API request reached an Internal Server Error:
+        {e}"""
 
 except openai.RateLimitError as e:
     print(f"""OpenAI API request has exceeded the Rate Limit:
         {e}""")
-    feedback_message = (
-        f"""Open AI API request has exceeded the Rate Limit:
-        {e}""")
+    feedback_message = f"""Open AI API request has exceeded the Rate Limit:
+        {e}"""
 
 
 """ Remove any leading file details if present using list slicing """
 if feedback_message.startswith("```markdown"):
-    feedback_message = feedback_message[len("```markdown"):]
+    feedback_message = feedback_message[len("```markdown") :]
 elif feedback_message.startswith(FENCE):
-    feedback_message = feedback_message[len(FENCE):]
+    feedback_message = feedback_message[len(FENCE) :]
 
 
 """ Remove trailing code fence if present """
 feedback_message = feedback_message.rstrip()  # Removes trailing whitespace
 if feedback_message.endswith(FENCE):
-    feedback_message = feedback_message[:len(feedback_message) - len(FENCE)]
+    feedback_message = feedback_message[: len(feedback_message) - len(FENCE)]
 
 
 """ Writes feedback to markdown file """

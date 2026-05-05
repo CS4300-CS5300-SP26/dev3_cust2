@@ -7,6 +7,7 @@ from home.models import Game, SimilarGame
 
 class GameFactory:
     """Helper to create Game instances with sensible defaults."""
+
     @staticmethod
     def create(**kwargs):
         defaults = {
@@ -81,14 +82,20 @@ class PublisherDeveloperBoostTestCase(TestCase):
         )
 
     def test_both_match(self):
-        self.assertEqual(util.publisher_developer_boost(self.base_game, self.similar_game), 0.4)
+        self.assertEqual(
+            util.publisher_developer_boost(self.base_game, self.similar_game), 0.4
+        )
 
     def test_publisher_only(self):
         self.unrelated_game.publisher = "Wube Software LTD."
-        self.assertEqual(util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.2)
+        self.assertEqual(
+            util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.2
+        )
 
     def test_no_match(self):
-        self.assertEqual(util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.0)
+        self.assertEqual(
+            util.publisher_developer_boost(self.base_game, self.unrelated_game), 0.0
+        )
 
 
 class DeduplicateByTitleTestCase(TestCase):
@@ -103,7 +110,11 @@ class DeduplicateByTitleTestCase(TestCase):
         )
 
     def test_removes_duplicates(self):
-        scored = [(self.base_game, 0.9), (self.base_game, 0.5), (self.similar_game, 0.7)]
+        scored = [
+            (self.base_game, 0.9),
+            (self.base_game, 0.5),
+            (self.similar_game, 0.7),
+        ]
         result = util.deduplicate_by_title(scored)
         self.assertEqual(len(result), 2)
 
@@ -158,4 +169,3 @@ class GetSimilarGamesTestCase(TestCase):
         self.similar_game.delete()
         result = util.get_similar_games(self.base_game)
         self.assertEqual(result, [])
-

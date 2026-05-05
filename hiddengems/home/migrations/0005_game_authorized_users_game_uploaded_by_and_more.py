@@ -9,23 +9,31 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('home', '0004_game_game_id_game_publisher_game_storefront_and_more'),
+        ("home", "0004_game_game_id_game_publisher_game_storefront_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='game',
-            name='authorized_users',
-            field=models.ManyToManyField(blank=True, related_name='authorized_games', to=settings.AUTH_USER_MODEL),
+            model_name="game",
+            name="authorized_users",
+            field=models.ManyToManyField(
+                blank=True, related_name="authorized_games", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='game',
-            name='uploaded_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='uploaded_games', to=settings.AUTH_USER_MODEL),
+            model_name="game",
+            name="uploaded_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="uploaded_games",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='game',
-            name='developer',
+            model_name="game",
+            name="developer",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

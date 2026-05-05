@@ -6,24 +6,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0009_merge_20260420_2333'),
+        ("home", "0009_merge_20260420_2333"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GenreTag',
+            name="GenreTag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('slug', models.SlugField(unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("slug", models.SlugField(unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.AddField(
-            model_name='game',
-            name='genre_tags',
-            field=models.ManyToManyField(blank=True, related_name='games', to='home.genretag'),
+            model_name="game",
+            name="genre_tags",
+            field=models.ManyToManyField(
+                blank=True, related_name="games", to="home.genretag"
+            ),
         ),
     ]
