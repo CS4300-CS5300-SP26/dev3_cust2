@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.core.validators import FileExtensionValidator  # add to imports
 import decimal
 from .models import Game
 
