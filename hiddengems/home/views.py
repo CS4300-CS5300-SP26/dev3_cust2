@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from openai import OpenAI
 
 from .forms import GameUploadForm
-from .models import CANONICAL_GENRES, Game, GenreTag, Rating
+from .models import CANONICAL_GENRES, Game, GenreTag, Rating, Profile
 from .utils import get_similar_games
 
 
@@ -363,7 +363,8 @@ def toggle_favorite(request, game_id):
 @login_required
 def user_page(request, username):
     user_obj = get_object_or_404(User, username=username)
-    favorites = user_obj.profile.favorites.all()
+    profile, _ = Profile.objects.get_or_create(user=user_obj)
+    favorites = profile.favorites.all()
 
     return render(request, "user.html", {
         "favorites": favorites,
