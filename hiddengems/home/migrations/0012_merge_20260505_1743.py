@@ -6,10 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0010_game_on_steam_alter_game_build_file_and_more'),
-        ('home', '0010_genre_tags'),
-        ('home', '0011_rating'),
+        ("home", "0010_game_on_steam_alter_game_build_file_and_more"),
+        ("home", "0010_genre_tags"),
+        ("home", "0011_rating"),
     ]
 
-    operations = [
-    ]
+    operations = []

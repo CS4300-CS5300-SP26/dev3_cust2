@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0005_alter_game_developer'),
-        ('home', '0005_game_authorized_users_game_uploaded_by_and_more'),
+        ("home", "0005_alter_game_developer"),
+        ("home", "0005_game_authorized_users_game_uploaded_by_and_more"),
     ]
 
-    operations = [
-    ]
+    operations = []

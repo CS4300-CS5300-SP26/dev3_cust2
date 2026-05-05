@@ -6,11 +6,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0006_merge_20260418_0150'),
-        ('home', '0006_merge_20260420_2010'),
-        ('home', '0007_adding_similar_games'),
-        ('home', '0007_alter_game_slug'),
+        ("home", "0006_merge_20260418_0150"),
+        ("home", "0006_merge_20260420_2010"),
+        ("home", "0007_adding_similar_games"),
+        ("home", "0007_alter_game_slug"),
     ]
 
-    operations = [
-    ]
+    operations = []
