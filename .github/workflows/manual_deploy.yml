@@ -26,7 +26,7 @@ jobs:
       run: |
         ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
           cd /home/django/dev3_cust2/hiddengems
-          git pull origin main
+          git pull origin main --rebase
           pip install -r requirements.txt
           python3 manage.py migrate
           python3 manage.py collectstatic --noinput
