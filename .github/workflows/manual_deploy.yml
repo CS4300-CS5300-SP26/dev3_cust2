@@ -24,6 +24,7 @@ jobs:
 
     - name: Deploy Main to DigitalOcean
       id: auto_deploy
+      continue-on-error: true
       run: |
         ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
           cd /home/django/dev3_cust2
