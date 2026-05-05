@@ -17,7 +17,9 @@ class Migration(migrations.Migration):
             model_name="game",
             name="authorized_users",
             field=models.ManyToManyField(
-                blank=True, related_name="authorized_games", to=settings.AUTH_USER_MODEL
+                blank=True,
+                related_name="authorized_games",
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddField(

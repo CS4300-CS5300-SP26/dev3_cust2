@@ -150,8 +150,8 @@ class AiTagGameTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_api_error(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError(
-            "API unavailable"
+        mock_openai_cls.return_value.responses.create.side_effect = (
+            RuntimeError("API unavailable")
         )
         game = _make_game()
 
@@ -184,7 +184,8 @@ class UploadGameGenreTaggingTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="uploader", password="pass")
+            username="uploader", password="pass"
+        )
         self.client.login(username="uploader", password="pass")
         self.upload_url = reverse("upload_game")
 

@@ -10,7 +10,8 @@ class BrowserPlayableTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testdev", password="testpass123")
+            username="testdev", password="testpass123"
+        )
         self.browser_game = Game.objects.create(
             title="Browser Game",
             description="Play me in your browser!",
@@ -70,8 +71,8 @@ class BrowserPlayableTests(TestCase):
         )
         self.assertTrue(
             Game.objects.filter(
-                title="My Web Game",
-                playable_in_browser=True).exists()
+                title="My Web Game", playable_in_browser=True
+            ).exists()
         )
 
     def test_upload_game_as_non_browser_playable(self):

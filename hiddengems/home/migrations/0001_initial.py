@@ -28,13 +28,21 @@ class Migration(migrations.Migration):
                 ),
                 ("title", models.CharField(max_length=200)),
                 ("description", models.TextField()),
-                ("price", models.DecimalField(decimal_places=2, max_digits=6)),
+                (
+                    "price",
+                    models.DecimalField(decimal_places=2, max_digits=6),
+                ),
                 ("genre", models.CharField(max_length=100)),
                 ("playable_in_browser", models.BooleanField(default=False)),
-                ("other_platforms", models.CharField(blank=True, max_length=200)),
+                (
+                    "other_platforms",
+                    models.CharField(blank=True, max_length=200),
+                ),
                 ("thumbnail", models.FileField(upload_to="game_thumbnails/")),
-                ("build_file", models.FileField(
-                    blank=True, upload_to="game_builds/")),
+                (
+                    "build_file",
+                    models.FileField(blank=True, upload_to="game_builds/"),
+                ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "developer",

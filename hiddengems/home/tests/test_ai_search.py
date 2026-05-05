@@ -8,7 +8,11 @@ from home.views import _ai_parse_query
 
 
 def make_ai_response(
-    keywords=None, vibe_keywords=None, genre=None, free_only=False, max_price=None
+    keywords=None,
+    vibe_keywords=None,
+    genre=None,
+    free_only=False,
+    max_price=None,
 ):
     """Helper that builds the dict _ai_parse_query returns."""
     return {
@@ -61,7 +65,8 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_strips_bare_code_fences_without_language_tag(
-            self, mock_openai_cls):
+        self, mock_openai_cls
+    ):
         payload = '```\n{"keywords": ["rpg"], "vibe_keywords": [], "genre": "RPG", "free_only": false, "max_price": null}\n```'
         mock_openai_cls.return_value.responses.create.return_value = (
             self._mock_response(payload)
@@ -117,8 +122,8 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_api_error(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError(
-            "API unavailable"
+        mock_openai_cls.return_value.responses.create.side_effect = (
+            RuntimeError("API unavailable")
         )
 
         with self.assertRaises(RuntimeError):
@@ -221,8 +226,8 @@ class BrowseAiSearchTests(TestCase):
         ai_result = make_ai_response(keywords=["terrifying"], genre="RPG")
         with self._patch_ai(ai_result):
             response = self.client.get(
-                self.browse_url, {
-                    "q": "terrifying rpg"})
+                self.browse_url, {"q": "terrifying rpg"}
+            )
 
         titles = [g.title for g in response.context["games"]]
         self.assertIn("Shadow Depths", titles)
@@ -246,8 +251,8 @@ class BrowseAiSearchTests(TestCase):
         ai_result = make_ai_response(max_price=5)
         with self._patch_ai(ai_result):
             response = self.client.get(
-                self.browse_url, {
-                    "q": "games under $5"})
+                self.browse_url, {"q": "games under $5"}
+            )
 
         games = list(response.context["games"])
         for game in games:
@@ -283,15 +288,17 @@ class BrowseAiSearchTests(TestCase):
         ai_result = make_ai_response(keywords=["xyznonexistent"])
         with self._patch_ai(ai_result):
             response = self.client.get(
-                self.browse_url, {
-                    "q": "xyznonexistent"})
+                self.browse_url, {"q": "xyznonexistent"}
+            )
 
         self.assertEqual(len(response.context["games"]), 0)
 
     # --- Fallback to plain-text search on AI failure ---
 
     def test_fallback_search_on_ai_exception(self):
-        with patch("home.views._ai_parse_query", side_effect=RuntimeError("AI down")):
+        with patch(
+            "home.views._ai_parse_query", side_effect=RuntimeError("AI down")
+        ):
             response = self.client.get(self.browse_url, {"q": "Horror"})
 
         self.assertEqual(response.status_code, 200)
@@ -299,14 +306,18 @@ class BrowseAiSearchTests(TestCase):
         self.assertIn("Shadow Depths", titles)
 
     def test_fallback_search_does_not_return_unrelated_games(self):
-        with patch("home.views._ai_parse_query", side_effect=RuntimeError("AI down")):
+        with patch(
+            "home.views._ai_parse_query", side_effect=RuntimeError("AI down")
+        ):
             response = self.client.get(self.browse_url, {"q": "Horror"})
 
         titles = [g.title for g in response.context["games"]]
         self.assertNotIn("Epic Quest", titles)
 
     def test_fallback_search_matches_developer_field(self):
-        with patch("home.views._ai_parse_query", side_effect=RuntimeError("AI down")):
+        with patch(
+            "home.views._ai_parse_query", side_effect=RuntimeError("AI down")
+        ):
             response = self.client.get(self.browse_url, {"q": "Scary Dev"})
 
         titles = [g.title for g in response.context["games"]]

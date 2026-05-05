@@ -25,17 +25,22 @@ import requests
 # ── CLI args ────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="HiddenGems security fix tests")
+        description="HiddenGems security fix tests"
+    )
     parser.add_argument(
         "--base-url",
         default="http://localhost:8000",
         help="Base URL of the running app (no trailing slash)",
     )
     parser.add_argument(
-        "--username", default="testuser", help="Existing test account username"
+        "--username",
+        default="testuser",
+        help="Existing test account username",
     )
     parser.add_argument(
-        "--password", default="testpass123", help="Existing test account password"
+        "--password",
+        default="testpass123",
+        help="Existing test account password",
     )
     args = parser.parse_args()
     BASE = args.base_url.rstrip("/")
@@ -99,7 +104,11 @@ def upload_file(session, filename, content, content_type, extra_fields=None):
         fields.update(extra_fields)
     files = {"build_file": (filename, io.BytesIO(content), content_type)}
     return session.post(
-        url, data=fields, files=files, headers={"Referer": url}, allow_redirects=True
+        url,
+        data=fields,
+        files=files,
+        headers={"Referer": url},
+        allow_redirects=True,
     )
 
 
@@ -160,10 +169,8 @@ else:
       <script>alert(document.cookie)</script>
     </svg>"""
     files = {
-        "thumbnail": (
-            "evil.svg",
-            io.BytesIO(malicious_svg),
-            "image/svg+xml")}
+        "thumbnail": ("evil.svg", io.BytesIO(malicious_svg), "image/svg+xml")
+    }
     data = {
         "title": "SVG Test Game",
         "description": "Security test",
@@ -171,7 +178,11 @@ else:
         "csrfmiddlewaretoken": csrf,
     }
     resp2 = s2.post(
-        url, data=data, files=files, headers={"Referer": url}, allow_redirects=True
+        url,
+        data=data,
+        files=files,
+        headers={"Referer": url},
+        allow_redirects=True,
     )
     svg_blocked = resp2.status_code == 200 and (
         "not allowed" in resp2.text.lower()
@@ -203,10 +214,7 @@ else:
     if resp3.url and "/game/" in resp3.url:
         page = s3.get(resp3.url)
         has_sandbox = "sandbox=" in page.text or 'sandbox"' in page.text
-        result(
-            "iframe sandbox attribute present",
-            has_sandbox,
-            f"Checked: {
+        result("iframe sandbox attribute present", has_sandbox, f"Checked: {
                 resp3.url}")
     else:
         # Check browse page for any game with playable_in_browser
@@ -251,7 +259,8 @@ redirect_blocked = "attacker.example.com" not in location
 result(
     "Open redirect blocked",
     redirect_blocked,
-    f"Redirect location: '{location}'")
+    f"Redirect location: '{location}'",
+)
 
 # ── Test 5: Logout requires POST (GET should not log out) ───────────────
 print("\nTEST 5 — GET /accounts/logout/ should NOT log user out")

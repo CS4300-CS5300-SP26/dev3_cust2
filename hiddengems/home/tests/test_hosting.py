@@ -10,7 +10,8 @@ class GameModelSadPathTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testdev", password="testpass123")
+            username="testdev", password="testpass123"
+        )
 
     # --- Slug edge cases ---
 
@@ -42,9 +43,8 @@ class GameModelSadPathTests(TestCase):
     def test_game_str_returns_title(self):
         # __str__ should return the game title
         game = Game.objects.create(
-            title="My Game",
-            description="desc",
-            price="9.99")
+            title="My Game", description="desc", price="9.99"
+        )
         self.assertEqual(str(game), "My Game")
 
     def test_developer_field_can_be_blank(self):
@@ -71,9 +71,8 @@ class GameModelSadPathTests(TestCase):
     def test_game_id_can_be_null(self):
         # game_id is optional and can be null
         game = Game.objects.create(
-            title="No ID Game",
-            description="desc",
-            price="9.99")
+            title="No ID Game", description="desc", price="9.99"
+        )
         self.assertIsNone(game.game_id)
 
     def test_storefront_defaults_to_steam(self):
@@ -102,7 +101,8 @@ class GameModelSadPathTests(TestCase):
     def test_authorized_users_can_have_multiple(self):
         # Multiple users can be authorized for the same game
         user2 = User.objects.create_user(
-            username="otherdev", password="testpass123")
+            username="otherdev", password="testpass123"
+        )
         game = Game.objects.create(
             title="Collab Game", description="desc", price="9.99"
         )
@@ -112,7 +112,10 @@ class GameModelSadPathTests(TestCase):
     def test_deleting_user_deletes_their_uploaded_games(self):
         # Deleting a user should cascade delete their uploaded games
         game = Game.objects.create(
-            title="User Game", description="desc", price="9.99", uploaded_by=self.user
+            title="User Game",
+            description="desc",
+            price="9.99",
+            uploaded_by=self.user,
         )
         self.user.delete()
         self.assertFalse(Game.objects.filter(title="User Game").exists())

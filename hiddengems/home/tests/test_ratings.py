@@ -62,6 +62,5 @@ class RatingTests(TestCase):
 
         # Should not create a rating
         self.assertFalse(
-            Rating.objects.filter(
-                user=self.user,
-                game=self.game).exists())
+            Rating.objects.filter(user=self.user, game=self.game).exists()
+        )

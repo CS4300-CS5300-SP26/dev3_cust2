@@ -8,7 +8,13 @@ from .models import Game, SimilarGame
 def game_to_text(game):
     """Convert a game's fields into a single string for TF-IDF analysis."""
     return " ".join(
-        [game.title, game.genre, game.description, game.developer, game.publisher]
+        [
+            game.title,
+            game.genre,
+            game.description,
+            game.developer,
+            game.publisher,
+        ]
     )
 
 
@@ -30,8 +36,9 @@ def title_similarity_boost(title1, title2):
     jaccard = len(intersection) / len(union)
 
     # Boost if one title is a subset of the other (e.g. sequels/DLC)
-    subset_boost = 0.3 if words1.issubset(
-        words2) or words2.issubset(words1) else 0.0
+    subset_boost = (
+        0.3 if words1.issubset(words2) or words2.issubset(words1) else 0.0
+    )
 
     return jaccard + subset_boost
 
@@ -88,8 +95,9 @@ def compute_similar_games(game, min_similarity=0.3):
     tfidf_scores = compute_tfidf_similarities(game, all_games)
     scored_games = compute_combined_scores(game, all_games, tfidf_scores)
 
-    similar = [(g, score)
-               for g, score in scored_games if score >= min_similarity]
+    similar = [
+        (g, score) for g, score in scored_games if score >= min_similarity
+    ]
     similar.sort(key=lambda x: x[1], reverse=True)
     similar = deduplicate_by_title(similar)
 
@@ -100,8 +108,10 @@ def store_similar_games(game, scored_games):
     """Persist similar games to the database."""
     SimilarGame.objects.filter(game=game).delete()
     SimilarGame.objects.bulk_create(
-        [SimilarGame(game=game, similar=g, score=score)
-         for g, score in scored_games]
+        [
+            SimilarGame(game=game, similar=g, score=score)
+            for g, score in scored_games
+        ]
     )
 
 

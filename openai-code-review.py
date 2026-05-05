@@ -59,7 +59,8 @@ with open("diff.txt", "r") as file:
 openai_key = os.getenv("OPENAI_API_KEY")
 if not openai_key:
     raise ValueError(
-        "No API key found. Set the OPENAI_API_KEY environment variable.")
+        "No API key found. Set the OPENAI_API_KEY environment variable."
+    )
 
 
 """ Query ChatGPT for a client """
@@ -145,9 +146,9 @@ except openai.RateLimitError as e:
 
 """ Remove any leading file details if present using list slicing """
 if feedback_message.startswith("```markdown"):
-    feedback_message = feedback_message[len("```markdown"):]
+    feedback_message = feedback_message[len("```markdown") :]
 elif feedback_message.startswith(FENCE):
-    feedback_message = feedback_message[len(FENCE):]
+    feedback_message = feedback_message[len(FENCE) :]
 
 
 """ Remove trailing code fence if present """

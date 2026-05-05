@@ -11,18 +11,23 @@ class BrowserPlayableGameTests(TestCase):
         # Create a test user and log them in before each test
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testdev", password="testpass123")
+            username="testdev", password="testpass123"
+        )
         self.client.login(username="testdev", password="testpass123")
         self.upload_url = reverse("upload_game")
 
         # A minimal valid HTML file to simulate a game build upload
         self.fake_build = SimpleUploadedFile(
-            "fakegame.html", b"<html><body>Game</body></html>", content_type="text/html"
+            "fakegame.html",
+            b"<html><body>Game</body></html>",
+            content_type="text/html",
         )
 
         # A minimal thumbnail image (1x1 pixel PNG)
         self.fake_thumbnail = SimpleUploadedFile(
-            "thumb.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 100, content_type="image/png"
+            "thumb.png",
+            b"\x89PNG\r\n\x1a\n" + b"\x00" * 100,
+            content_type="image/png",
         )
 
     # --- Happy path tests ---
@@ -93,7 +98,9 @@ class BrowserPlayableGameTests(TestCase):
         # Play Demo section should appear when game is browser playable with a
         # build file
         build = SimpleUploadedFile(
-            "game.html", b"<html><body>Game</body></html>", content_type="text/html"
+            "game.html",
+            b"<html><body>Game</body></html>",
+            content_type="text/html",
         )
         game = Game.objects.create(
             title="Playable Game",
@@ -140,7 +147,9 @@ class BrowserPlayableGameTests(TestCase):
     def test_game_detail_shows_browser_badge_when_playable(self):
         # Playable in Browser badge should appear on the game card
         build = SimpleUploadedFile(
-            "game.html", b"<html><body>Game</body></html>", content_type="text/html"
+            "game.html",
+            b"<html><body>Game</body></html>",
+            content_type="text/html",
         )
         game = Game.objects.create(
             title="Badge Game",
@@ -160,9 +169,8 @@ class BrowserPlayableGameTests(TestCase):
     def test_game_detail_404_for_invalid_slug(self):
         # Should return 404 for a slug that doesn't exist
         response = self.client.get(
-            reverse(
-                "game_detail",
-                args=["nonexistent-game"]))
+            reverse("game_detail", args=["nonexistent-game"])
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_upload_playable_game_without_build_file(self):

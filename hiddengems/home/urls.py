@@ -17,12 +17,15 @@ urlpatterns = [
     # Game detail page accessed by slug
     path("game/<slug:slug>/", views.game_detail, name="game_detail"),
     path(
-        "favorite/<int:game_id>/toggle/", views.toggle_favorite, name="toggle_favorite"
+        "favorite/<int:game_id>/toggle/",
+        views.toggle_favorite,
+        name="toggle_favorite",
     ),
     path("user/<str:username>/", views.user_page, name="user_page"),
     path("rate/<int:game_id>/", views.rate_game, name="rate_game"),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+    )

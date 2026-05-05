@@ -137,8 +137,9 @@ def _ai_tag_game(game):
                 "role": "system",
                 "content": (
                     "You are a game genre classifier. Given a game's info, assign 1–3 genre tags "
-                    "from this exact list: " +
-                        ", ".join(CANONICAL_GENRES) + ".\n\n"
+                    "from this exact list: "
+                    + ", ".join(CANONICAL_GENRES)
+                    + ".\n\n"
                     'Respond with ONLY a JSON array of strings, e.g. ["Action", "RPG"]. '
                     "Pick only genres that clearly fit. Use fewer, accurate tags over many."
                 ),
@@ -321,8 +322,8 @@ def browse(request):
                 games = games.filter(text_filter)
             elif genre:
                 games = games.filter(
-                    Q(genre__icontains=genre) | Q(
-                        genre_tags__name__icontains=genre)
+                    Q(genre__icontains=genre)
+                    | Q(genre_tags__name__icontains=genre)
                 ).distinct()
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
@@ -363,7 +364,8 @@ def game_detail(request, slug):
     user_rating = None
     if request.user.is_authenticated:
         user_rating = Rating.objects.filter(
-            user=request.user, game=game).first()
+            user=request.user, game=game
+        ).first()
 
     return render(
         request,

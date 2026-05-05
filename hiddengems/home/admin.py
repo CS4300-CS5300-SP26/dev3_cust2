@@ -19,7 +19,8 @@ class GameAdmin(admin.ModelAdmin):
         "developer",
         "storefront",
         "game_id",
-        "price")
+        "price",
+    )
     search_fields = ("title", "publisher", "developer", "game_id")
     change_list_template = "admin/home/game/change_list.html"
 
@@ -46,9 +47,11 @@ class GameAdmin(admin.ModelAdmin):
 
             if not start_id.isdigit() or not end_id.isdigit():
                 messages.error(
-                    request, "Start ID and End ID must both be numeric.")
+                    request, "Start ID and End ID must both be numeric."
+                )
                 return HttpResponseRedirect(
-                    reverse("admin:home_game_sync_update_all"))
+                    reverse("admin:home_game_sync_update_all")
+                )
 
             start_id = int(start_id)
             end_id = int(end_id)
@@ -58,7 +61,8 @@ class GameAdmin(admin.ModelAdmin):
                     request, "Start ID must be less than or equal to End ID."
                 )
                 return HttpResponseRedirect(
-                    reverse("admin:home_game_sync_update_all"))
+                    reverse("admin:home_game_sync_update_all")
+                )
 
             created_count = 0
             updated_count = 0
@@ -68,7 +72,8 @@ class GameAdmin(admin.ModelAdmin):
                 try:
                     steam_data = self.fetch_steam_game_data(str(steam_id))
                     game, created = self.upsert_steam_game(
-                        str(steam_id), steam_data)
+                        str(steam_id), steam_data
+                    )
 
                     if created:
                         created_count += 1
@@ -80,10 +85,12 @@ class GameAdmin(admin.ModelAdmin):
 
             if created_count:
                 messages.success(
-                    request, f"Created {created_count} Steam game(s).")
+                    request, f"Created {created_count} Steam game(s)."
+                )
             if updated_count:
                 messages.success(
-                    request, f"Updated {updated_count} Steam game(s).")
+                    request, f"Updated {updated_count} Steam game(s)."
+                )
             if failed_ids:
                 messages.warning(request, f"Failed IDs: {failed_ids}")
 
@@ -98,7 +105,8 @@ class GameAdmin(admin.ModelAdmin):
             "title": "Update Steam games by range",
         }
         return render(
-            request, "admin/home/game/update_range_form.html", context)
+            request, "admin/home/game/update_range_form.html", context
+        )
 
     def sync_update_one_view(self, request):
         if request.method == "POST":
@@ -107,7 +115,8 @@ class GameAdmin(admin.ModelAdmin):
             if not steam_id.isdigit():
                 messages.error(request, "Steam ID must be numeric.")
                 return HttpResponseRedirect(
-                    reverse("admin:home_game_sync_update_one"))
+                    reverse("admin:home_game_sync_update_one")
+                )
 
             try:
                 steam_data = self.fetch_steam_game_data(steam_id)
@@ -119,22 +128,28 @@ class GameAdmin(admin.ModelAdmin):
                     messages.success(request, f"Updated {game.title}.")
 
                 return HttpResponseRedirect(
-                    reverse("admin:home_game_changelist"))
+                    reverse("admin:home_game_changelist")
+                )
 
             except Exception as e:
                 messages.error(request, f"Error: {e}")
                 return HttpResponseRedirect(
-                    reverse("admin:home_game_sync_update_one"))
+                    reverse("admin:home_game_sync_update_one")
+                )
 
         context = {
             **self.admin_site.each_context(request),
             "opts": self.model._meta,
             "title": "Update one Steam game",
         }
-        return render(request, "admin/home/game/update_one_form.html", context)
+        return render(
+            request, "admin/home/game/update_one_form.html", context
+        )
 
     def fetch_steam_game_data(self, steam_id):
-        url = f"https://store.steampowered.com/api/appdetails?appids={steam_id}"
+        url = (
+            f"https://store.steampowered.com/api/appdetails?appids={steam_id}"
+        )
 
         try:
             with urlopen(url) as response:

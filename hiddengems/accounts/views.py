@@ -43,7 +43,8 @@ def signup_view(request):
             login(
                 request,
                 user,
-                backend="django.contrib.auth.backends.ModelBackend")
+                backend="django.contrib.auth.backends.ModelBackend",
+            )
             return redirect("index")
     else:
         # Show empty signup form

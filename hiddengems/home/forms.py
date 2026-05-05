@@ -20,8 +20,8 @@ class GameUploadForm(forms.ModelForm):
 
     # Steam Integration fields
     on_steam = forms.BooleanField(
-        required=False,
-        label="Is this game on Steam?")
+        required=False, label="Is this game on Steam?"
+    )
     steam_id = forms.IntegerField(
         required=False,
         label="Steam App ID",
@@ -96,7 +96,8 @@ class GameUploadForm(forms.ModelForm):
             ext = f.name.rsplit(".", 1)[-1].lower()
             if ext not in allowed:
                 raise ValidationError(
-                    "Build file must be a .zip or .wasm file.")
+                    "Build file must be a .zip or .wasm file."
+                )
         return f
 
     def clean_thumbnail(self):

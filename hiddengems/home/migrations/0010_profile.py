@@ -28,7 +28,9 @@ class Migration(migrations.Migration):
                 (
                     "favorites",
                     models.ManyToManyField(
-                        blank=True, related_name="favorited_by", to="home.game"
+                        blank=True,
+                        related_name="favorited_by",
+                        to="home.game",
                     ),
                 ),
                 (

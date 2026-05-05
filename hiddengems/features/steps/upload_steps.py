@@ -7,7 +7,8 @@ from home.models import Game
 def step_logged_in(context):
     # Create a test user and log them in
     context.user = User.objects.create_user(
-        username="testdev", password="testpass123")
+        username="testdev", password="testpass123"
+    )
     context.client.login(username="testdev", password="testpass123")
 
 
@@ -62,7 +63,9 @@ def step_see_form(context):
 @then("the game should not be saved")
 def step_game_not_saved(context):
     # No game should exist in the database
-    assert not Game.objects.exists(), "Game was saved but should not have been"
+    assert (
+        not Game.objects.exists()
+    ), "Game was saved but should not have been"
 
 
 @then("I should not see the upload form")

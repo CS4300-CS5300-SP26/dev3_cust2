@@ -33,8 +33,9 @@ class Command(BaseCommand):
 
         total = games.count()
         if total == 0:
-            self.stdout.write(self.style.SUCCESS(
-                "All games already have genre tags."))
+            self.stdout.write(
+                self.style.SUCCESS("All games already have genre tags.")
+            )
             return
 
         self.stdout.write(f"Tagging {total} game(s)...\n")
@@ -44,14 +45,15 @@ class Command(BaseCommand):
             try:
                 _ai_tag_game(game)
                 tags = ", ".join(
-                    game.genre_tags.values_list(
-                        "name", flat=True))
+                    game.genre_tags.values_list("name", flat=True)
+                )
                 self.stdout.write(f"  [{i}/{total}] {game.title}  →  {tags}")
                 success += 1
             except Exception as e:
                 self.stdout.write(
                     self.style.ERROR(
-                        f"  [{i}/{total}] {game.title}  →  FAILED: {e}")
+                        f"  [{i}/{total}] {game.title}  →  FAILED: {e}"
+                    )
                 )
                 failed += 1
 
