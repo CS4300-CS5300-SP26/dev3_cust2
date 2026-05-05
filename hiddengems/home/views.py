@@ -1,15 +1,20 @@
 import json
 import os
 
-from django.db.models import Q
-from django.http import HttpResponse
+from django.db.models import Q, Avg
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.core.cache import cache
+from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from openai import OpenAI
 
 from .forms import GameUploadForm
-from .models import Game
+from .models import CANONICAL_GENRES, Game, GenreTag, Rating
 from .utils import get_similar_games
 
 
@@ -99,7 +104,8 @@ def _ai_parse_query(query):
                     "- genre: a single genre string (e.g. 'RPG', 'Platformer', 'Puzzle', 'Horror', 'Strategy'), "
                     "or null if not specified. Only set this if the user clearly references a game genre.\n"
                     "- free_only: boolean, true if the user asks for free games, games that cost nothing, or $0 games\n"
-                    "- max_price: maximum price as a number, or null if not specified\n\n"
+                    "- max_price: maximum price as a number, or null if not specified\n"
+                    "- browser_playable: boolean, true if the user wants games playable in the browser (e.g. 'play in browser', 'browser game', 'no download')\n\n"
                     "Be generous with keywords and vibe_keywords — err on the side of more terms to avoid empty results. "
                     "For purely vibe-based queries (e.g. 'something relaxing'), populate vibe_keywords even if keywords is empty."
                 ),
@@ -119,6 +125,51 @@ def _ai_parse_query(query):
             raw = raw[4:]
         raw = raw.strip()
     return json.loads(raw)
+
+
+def _ai_tag_game(game):
+    """Call AI to assign 1–3 canonical genre tags to a game, then save and cache-bust."""
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    response = client.responses.create(
+        model="gpt-5.1-codex-mini",
+        input=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a game genre classifier. Given a game's info, assign 1–3 genre tags "
+                    "from this exact list: " + ", ".join(CANONICAL_GENRES) + ".\n\n"
+                    "Respond with ONLY a JSON array of strings, e.g. [\"Action\", \"RPG\"]. "
+                    "Pick only genres that clearly fit. Use fewer, accurate tags over many."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Title: {game.title}\n"
+                    f"Genre hint: {game.genre}\n"
+                    f"Description: {game.description[:600]}"
+                ),
+            },
+        ],
+    )
+    raw = response.output_text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    tag_names = json.loads(raw)
+    tag_names = [t for t in tag_names if t in CANONICAL_GENRES]
+
+    tags = []
+    for name in tag_names:
+        tag, _ = GenreTag.objects.get_or_create(name=name, defaults={"slug": slugify(name)})
+        tags.append(tag)
+
+    game.genre_tags.set(tags)
+    for tag in tags:
+        cache.delete(f"genre_games_{tag.slug}")
 
 
 # View that renders the homepage
@@ -155,6 +206,12 @@ def upload_game(request):
             # Save the game to the database
             game.save()
 
+            # Auto-assign AI genre tags (best-effort — don't fail upload on error)
+            try:
+                _ai_tag_game(game)
+            except Exception as e:
+                print(f"Genre tagging failed: {e}")
+
             # Redirect user after successful upload
             return redirect("index")
 
@@ -169,11 +226,31 @@ def upload_game(request):
 @require_GET
 def browse(request):
     query = request.GET.get("q", "").strip()
+    genre_slug = request.GET.get("genre", "").strip()
+    active_genre = None
     games = Game.objects.all().order_by("-created_at")
 
-    if query:
+    if genre_slug:
+        # Serve genre-filtered results from cache when available
+        cache_key = f"genre_games_{genre_slug}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            games = cached
+        else:
+            games = list(Game.objects.filter(genre_tags__slug=genre_slug).order_by("-created_at").distinct())
+            cache.set(cache_key, games, 3600)
         try:
-            filters = _ai_parse_query(query)
+            active_genre = GenreTag.objects.get(slug=genre_slug)
+        except GenreTag.DoesNotExist:
+            pass
+
+    elif query:
+        try:
+            cache_key = f"ai_query_{hash(query)}"
+            filters = cache.get(cache_key)
+            if filters is None:
+                filters = _ai_parse_query(query)
+                cache.set(cache_key, filters, 3600)
 
             # Build a combined text filter from keywords + vibe_keywords
             keywords = filters.get("keywords") or []
@@ -197,15 +274,22 @@ def browse(request):
             elif filters.get("max_price") is not None:
                 games = games.filter(price__lte=filters["max_price"])
 
+            browser_terms = {"browser", "playable", "web game", "web", "online", "no download", "in browser"}
+            browser_phrases = ("browser", "playable in browser", "browser playable", "no download", "web game", "play online")
+            is_browser_search = filters.get("browser_playable") or any(kw in query.lower() for kw in browser_phrases)
+            if is_browser_search:
+                games = games.filter(playable_in_browser=True)
+                all_terms = [t for t in all_terms if t not in browser_terms]
+
             # Apply text + genre filters. Combine them with OR so that a game
             # matching the vibe OR the genre qualifies — this avoids zero results
             # when genre tags in the DB don't perfectly match the AI's genre label.
             if all_terms and genre:
-                games = games.filter(text_filter | Q(genre__icontains=genre))
+                games = games.filter(text_filter | Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
             elif all_terms:
                 games = games.filter(text_filter)
             elif genre:
-                games = games.filter(genre__icontains=genre)
+                games = games.filter(Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
 
@@ -219,7 +303,14 @@ def browse(request):
                 | Q(genre__icontains=query)
             )
 
-    return render(request, "home/browse.html", {"games": games, "query": query})
+    all_genres = GenreTag.objects.filter(games__isnull=False).distinct()
+
+    return render(request, "home/browse.html", {
+        "games": games,
+        "query": query,
+        "active_genre": active_genre,
+        "all_genres": all_genres,
+    })
 
 
 @xframe_options_sameorigin
@@ -227,9 +318,19 @@ def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
     similar_games = get_similar_games(game)
 
+    # Average rating for this game
+    avg_rating = game.ratings.aggregate(Avg("score"))["score__avg"]
+
+    # Current user's rating (if logged in)
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(user=request.user, game=game).first()
+
     return render(request, "game_detail.html", {
         "game": game,  # Pass full game object — template accesses all fields via game.field
         "similar_games": similar_games,
+        "avg_rating": avg_rating,
+        "user_rating": user_rating,
     })
 
 
@@ -240,4 +341,49 @@ def purchase_game(request, game_id):
         "storefront": game.storefront,
         "price": game.price,
         "game_id": game.game_id,
+    })
+
+
+@login_required
+def toggle_favorite(request, game_id):
+    print("GAME ID RECEIVED:", game_id)
+    game = get_object_or_404(Game, id=game_id)
+    profile = request.user.profile
+
+    if game in profile.favorites.all():
+        profile.favorites.remove(game)
+        status = "removed"
+    else:
+        profile.favorites.add(game)
+        status = "added"
+
+    return JsonResponse({"status": status})
+
+
+@login_required
+def user_page(request, username):
+    user_obj = get_object_or_404(User, username=username)
+    favorites = user_obj.profile.favorites.all()
+
+    return render(request, "user.html", {
+        "favorites": favorites,
+        "profile_user": user_obj,
+    })
+
+
+@login_required
+def rate_game(request, game_id):
+    game = get_object_or_404(Game, id=game_id)
+    score = int(request.POST.get("score"))
+
+    rating, created = Rating.objects.update_or_create(
+        user=request.user,
+        game=game,
+        defaults={"score": score}
+    )
+
+    return JsonResponse({
+        "status": "ok",
+        "score": score,
+        "average": game.ratings.aggregate(Avg("score"))["score__avg"]
     })

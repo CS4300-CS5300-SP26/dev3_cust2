@@ -5,6 +5,29 @@ from django.dispatch import receiver
 from django.core.cache import cache
 from django.core.validators import FileExtensionValidator
 
+CANONICAL_GENRES = [
+    "Action", "Adventure", "RPG", "Strategy", "Puzzle", "Platformer",
+    "Horror", "Simulation", "Sports", "Racing", "Visual Novel", "Roguelike",
+    "Shoot-em-up", "Fighting", "Rhythm", "Card Game", "Metroidvania", "Idle",
+]
+
+
+class GenreTag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
 # Game model stores all information about a developer's uploaded game
 class Game(models.Model):
     # Title of the game
@@ -25,6 +48,8 @@ class Game(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     # Genre of the game (RPG, puzzle, platformer, etc.)
     genre = models.CharField(max_length=100, blank=True)
+    # AI-assigned genre tags (M2M, populated automatically on upload)
+    genre_tags = models.ManyToManyField(GenreTag, blank=True, related_name='games')
     # Indicates if the game can run directly in the browser
     playable_in_browser = models.BooleanField(default=False)
     # Other platforms the game is available on (Steam, itch.io, etc.)
@@ -68,12 +93,34 @@ class Game(models.Model):
     def __str__(self):
         return self.title
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorites = models.ManyToManyField(Game, blank=True, related_name="favorited_by")
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="ratings")
+    score = models.PositiveSmallIntegerField()  # 1–5
+
+    class Meta:
+        unique_together = ("user", "game")  # each user can rate a game once
+
+    def __str__(self):
+        return f"{self.user.username} rated {self.game.title} {self.score}/5"
 
 @receiver(models.signals.post_save, sender=Game)
 def invalidate_similar_games_cache(sender, instance, **kwargs):
     cache.delete(f"similar_games_{instance.pk}")
     SimilarGame.objects.filter(game=instance).delete()
 
+@receiver(models.signals.m2m_changed, sender=Game.genre_tags.through)
+def invalidate_genre_cache(sender, instance, action, pk_set, **kwargs):
+    if action in ('post_add', 'post_remove', 'post_clear'):
+        for tag in instance.genre_tags.all():
+            cache.delete(f"genre_games_{tag.slug}")
 
 class SimilarGame(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='similar_games')
