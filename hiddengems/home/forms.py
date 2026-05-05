@@ -7,6 +7,9 @@ from .models import Game
 
 # Form used by developers to upload a new game
 # ModelForm automatically creates fields based on the Game model
+help_string = "Enter the numeric Steam App ID "
+help_string += "(e.g. 400 for Team Fortress 2)"
+
 class GameUploadForm(forms.ModelForm):
     genre = forms.CharField(max_length=100, required=False)
     price = forms.DecimalField(
@@ -25,7 +28,7 @@ class GameUploadForm(forms.ModelForm):
     steam_id = forms.IntegerField(
         required=False,
         label="Steam App ID",
-        help_text="Enter the numeric Steam App ID (e.g. 440 for Team Fortress 2)",
+        help_text=help_string,
     )
 
     class Meta:
@@ -69,7 +72,8 @@ class GameUploadForm(forms.ModelForm):
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
                 raise ValidationError(
-                    "A game with this Steam App ID is already listed on Hidden Gems."
+                    "A game with this Steam App ID " +
+                    "is already listed on Hidden Gems."
                 )
 
         return steam_id
@@ -107,6 +111,7 @@ class GameUploadForm(forms.ModelForm):
             ext = f.name.rsplit(".", 1)[-1].lower()
             if ext not in allowed:
                 raise ValidationError(
-                    "Thumbnail must be jpg, png, gif, or webp. SVG is not allowed."
+                    "Thumbnail must be jpg, png, gif, or webp. " +
+                    "SVG is not allowed."
                 )
         return f

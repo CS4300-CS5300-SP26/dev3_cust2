@@ -114,18 +114,19 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "home/static")]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Full set of password validators — do not trim this list
+_PRE = "django.contrib.auth.password_validation"
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        "NAME": f"{_PRE}.UserAttributeSimilarityValidator"
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"
+        "NAME": f"{_PRE}.MinimumLengthValidator"
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+        "NAME": f"{_PRE}.CommonPasswordValidator"
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+        "NAME": f"{_PRE}.NumericPasswordValidator"
     },
 ]
 
