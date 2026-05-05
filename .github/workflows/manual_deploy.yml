@@ -25,10 +25,12 @@ jobs:
     - name: Deploy to Droplet
       run: |
         ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
-          cd /home/django/dev3_cust2
+          cd /home/django/dev3_cust2/hiddengems
           git pull origin main
-          docker compose down
-          docker compose up -d --build
-          docker compose exec -T app python3 manage.py migrate
-          docker compose exec -T app python3 manage.py collectstatic --noinput
+          pip install -r requirements.txt
+          python3 manage.py migrate
+          python3 manage.py collectstatic --noinput
+          sudo systemctl restart gunicorn 
         '
+
+### WORK IN PROGRESS ###
