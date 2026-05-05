@@ -21,12 +21,35 @@ jobs:
         echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
         chmod 600 ~/.ssh/deploy_key
         ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy Main to DigitalOcean
+      id: auto_deploy
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+          cd /home/django/dev3_cust2
+          git pull origin main
+        '
+
+    # Runs if the step above fails
+    - name: Push Local Changes from DigitalOcean
+      if: steps.auto_deploy.outcome == 'failure'
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+          cd /home/django/dev3_cust2
+          
+          git checkout -b prod-local-overrides   # create branch with current state
+          git add .                              # stage the local changes
+          git commit -m "prod server overrides"  # commit them to the branch
+          git push origin prod-local-overrides   # back it up remotely
+          
+          git checkout main && git pull          # update main
+        '
+        
     
-    - name: Deploy to Droplet
+    - name: Start Server
       run: |
         ssh -i ~/.ssh/deploy_key ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
           cd /home/django/dev3_cust2/hiddengems
-          git pull origin main --rebase
           pip install -r requirements.txt
           python3 manage.py migrate
           python3 manage.py collectstatic --noinput
