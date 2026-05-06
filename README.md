@@ -6,7 +6,13 @@ A community-driven platform for discovering and sharing indie games. Hidden Gems
 
 # Production Link
 
-[hiddengems](http://hiddengems.me)
+[HiddenGems](http://hiddengems.me)
+
+---
+
+# Marketing Video
+
+[HiddenGems Marketing Video](https://www.youtube.com/watch?v=nPMqvrVcFW4)
 
 ---
 

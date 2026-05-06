@@ -7,18 +7,14 @@ from .models import Game, SimilarGame
 
 def game_to_text(game):
     """Convert a game's fields into a single string for TF-IDF analysis."""
-    return " ".join([
-        game.title,
-        game.genre,
-        game.description,
-        game.developer,
-        game.publisher
-    ])
+    return " ".join(
+        [game.title, game.genre, game.description, game.developer, game.publisher]
+    )
 
 
 def clean_title(title):
-    stopwords = {'the', 'a', 'an', 'of', 'in', 'and', 'or', 'for'}
-    return set(re.sub(r'[^\w\s]', '', title.lower()).split()) - stopwords
+    stopwords = {"the", "a", "an", "of", "in", "and", "or", "for"}
+    return set(re.sub(r"[^\w\s]", "", title.lower()).split()) - stopwords
 
 
 def title_similarity_boost(title1, title2):
@@ -34,7 +30,8 @@ def title_similarity_boost(title1, title2):
     jaccard = len(intersection) / len(union)
 
     # Boost if one title is a subset of the other (e.g. sequels/DLC)
-    subset_boost = 0.3 if words1.issubset(words2) or words2.issubset(words1) else 0.0
+    subset_boost = 0.3 if words1.issubset(
+        words2) or words2.issubset(words1) else 0.0
 
     return jaccard + subset_boost
 
@@ -54,7 +51,7 @@ def publisher_developer_boost(game1, game2):
 def compute_tfidf_similarities(game, all_games):
     """Compute TF-IDF cosine similarity between a game and a list of games."""
     corpus = [game_to_text(game)] + [game_to_text(g) for g in all_games]
-    vectorizer = TfidfVectorizer(stop_words='english')
+    vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(corpus)
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
 
@@ -91,22 +88,21 @@ def compute_similar_games(game, min_similarity=0.3):
     tfidf_scores = compute_tfidf_similarities(game, all_games)
     scored_games = compute_combined_scores(game, all_games, tfidf_scores)
 
-    similar = [
-        (g, score) for g, score in scored_games
-        if score >= min_similarity
-    ]
+    similar = [(g, score)
+               for g, score in scored_games if score >= min_similarity]
     similar.sort(key=lambda x: x[1], reverse=True)
     similar = deduplicate_by_title(similar)
 
     return similar[:9]
 
+
 def store_similar_games(game, scored_games):
     """Persist similar games to the database."""
     SimilarGame.objects.filter(game=game).delete()
-    SimilarGame.objects.bulk_create([
-        SimilarGame(game=game, similar=g, score=score)
-        for g, score in scored_games
-    ])
+    SimilarGame.objects.bulk_create(
+        [SimilarGame(game=game, similar=g, score=score)
+         for g, score in scored_games]
+    )
 
 
 def get_similar_games(game):
@@ -124,8 +120,8 @@ def get_similar_games(game):
     # 2. Check database
     db_results = list(
         SimilarGame.objects.filter(game=game)
-        .select_related('similar')
-        .order_by('-score')[:9]
+        .select_related("similar")
+        .order_by("-score")[:9]
     )
     if db_results:
         similar = [entry.similar for entry in db_results]

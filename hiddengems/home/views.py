@@ -137,8 +137,9 @@ def _ai_tag_game(game):
                 "role": "system",
                 "content": (
                     "You are a game genre classifier. Given a game's info, assign 1–3 genre tags "
-                    "from this exact list: " + ", ".join(CANONICAL_GENRES) + ".\n\n"
-                    "Respond with ONLY a JSON array of strings, e.g. [\"Action\", \"RPG\"]. "
+                    "from this exact list: " +
+                        ", ".join(CANONICAL_GENRES) + ".\n\n"
+                    'Respond with ONLY a JSON array of strings, e.g. ["Action", "RPG"]. '
                     "Pick only genres that clearly fit. Use fewer, accurate tags over many."
                 ),
             },
@@ -164,7 +165,9 @@ def _ai_tag_game(game):
 
     tags = []
     for name in tag_names:
-        tag, _ = GenreTag.objects.get_or_create(name=name, defaults={"slug": slugify(name)})
+        tag, _ = GenreTag.objects.get_or_create(
+            name=name, defaults={"slug": slugify(name)}
+        )
         tags.append(tag)
 
     game.genre_tags.set(tags)
@@ -174,13 +177,14 @@ def _ai_tag_game(game):
 
 # View that renders the homepage
 def index(request):
-    return render(request, 'index.html')
+    return render(request, "index.html")
 
 
 # View that handles the game upload page
 def upload_game(request):
 
-    # Redirect unauthenticated users to login page, then back to upload after login
+    # Redirect unauthenticated users to login page, then back to upload after
+    # login
     if not request.user.is_authenticated:
         return redirect(f"/accounts/login/?next=/upload/")
 
@@ -206,7 +210,8 @@ def upload_game(request):
             # Save the game to the database
             game.save()
 
-            # Auto-assign AI genre tags (best-effort — don't fail upload on error)
+            # Auto-assign AI genre tags (best-effort — don't fail upload on
+            # error)
             try:
                 _ai_tag_game(game)
             except Exception as e:
@@ -237,7 +242,11 @@ def browse(request):
         if cached is not None:
             games = cached
         else:
-            games = list(Game.objects.filter(genre_tags__slug=genre_slug).order_by("-created_at").distinct())
+            games = list(
+                Game.objects.filter(genre_tags__slug=genre_slug)
+                .order_by("-created_at")
+                .distinct()
+            )
             cache.set(cache_key, games, 3600)
         try:
             active_genre = GenreTag.objects.get(slug=genre_slug)
@@ -274,22 +283,47 @@ def browse(request):
             elif filters.get("max_price") is not None:
                 games = games.filter(price__lte=filters["max_price"])
 
-            browser_terms = {"browser", "playable", "web game", "web", "online", "no download", "in browser"}
-            browser_phrases = ("browser", "playable in browser", "browser playable", "no download", "web game", "play online")
-            is_browser_search = filters.get("browser_playable") or any(kw in query.lower() for kw in browser_phrases)
+            browser_terms = {
+                "browser",
+                "playable",
+                "web game",
+                "web",
+                "online",
+                "no download",
+                "in browser",
+            }
+            browser_phrases = (
+                "browser",
+                "playable in browser",
+                "browser playable",
+                "no download",
+                "web game",
+                "play online",
+            )
+            is_browser_search = filters.get("browser_playable") or any(
+                kw in query.lower() for kw in browser_phrases
+            )
             if is_browser_search:
                 games = games.filter(playable_in_browser=True)
                 all_terms = [t for t in all_terms if t not in browser_terms]
 
             # Apply text + genre filters. Combine them with OR so that a game
             # matching the vibe OR the genre qualifies — this avoids zero results
-            # when genre tags in the DB don't perfectly match the AI's genre label.
+            # when genre tags in the DB don't perfectly match the AI's genre
+            # label.
             if all_terms and genre:
-                games = games.filter(text_filter | Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
+                games = games.filter(
+                    text_filter
+                    | Q(genre__icontains=genre)
+                    | Q(genre_tags__name__icontains=genre)
+                ).distinct()
             elif all_terms:
                 games = games.filter(text_filter)
             elif genre:
-                games = games.filter(Q(genre__icontains=genre) | Q(genre_tags__name__icontains=genre)).distinct()
+                games = games.filter(
+                    Q(genre__icontains=genre) | Q(
+                        genre_tags__name__icontains=genre)
+                ).distinct()
             # If neither terms nor genre were extracted, return all games
             # (price filter already narrowed the set above)
 
@@ -305,12 +339,16 @@ def browse(request):
 
     all_genres = GenreTag.objects.filter(games__isnull=False).distinct()
 
-    return render(request, "home/browse.html", {
-        "games": games,
-        "query": query,
-        "active_genre": active_genre,
-        "all_genres": all_genres,
-    })
+    return render(
+        request,
+        "home/browse.html",
+        {
+            "games": games,
+            "query": query,
+            "active_genre": active_genre,
+            "all_genres": all_genres,
+        },
+    )
 
 
 @xframe_options_sameorigin
@@ -324,24 +362,33 @@ def game_detail(request, slug):
     # Current user's rating (if logged in)
     user_rating = None
     if request.user.is_authenticated:
-        user_rating = Rating.objects.filter(user=request.user, game=game).first()
+        user_rating = Rating.objects.filter(
+            user=request.user, game=game).first()
 
-    return render(request, "game_detail.html", {
-        "game": game,  # Pass full game object — template accesses all fields via game.field
-        "similar_games": similar_games,
-        "avg_rating": avg_rating,
-        "user_rating": user_rating,
-    })
+    return render(
+        request,
+        "game_detail.html",
+        {
+            "game": game,  # Pass full game object — template accesses all fields via game.field
+            "similar_games": similar_games,
+            "avg_rating": avg_rating,
+            "user_rating": user_rating,
+        },
+    )
 
 
 def purchase_game(request, game_id):
     game = get_object_or_404(Game, game_id=game_id)
 
-    return render(request, "purchase_game.html", {
-        "storefront": game.storefront,
-        "price": game.price,
-        "game_id": game.game_id,
-    })
+    return render(
+        request,
+        "purchase_game.html",
+        {
+            "storefront": game.storefront,
+            "price": game.price,
+            "game_id": game.game_id,
+        },
+    )
 
 
 @login_required
@@ -366,10 +413,14 @@ def user_page(request, username):
     profile, _ = Profile.objects.get_or_create(user=user_obj)
     favorites = profile.favorites.all()
 
-    return render(request, "user.html", {
-        "favorites": favorites,
-        "profile_user": user_obj,
-    })
+    return render(
+        request,
+        "user.html",
+        {
+            "favorites": favorites,
+            "profile_user": user_obj,
+        },
+    )
 
 
 @login_required
@@ -378,13 +429,13 @@ def rate_game(request, game_id):
     score = int(request.POST.get("score"))
 
     rating, created = Rating.objects.update_or_create(
-        user=request.user,
-        game=game,
-        defaults={"score": score}
+        user=request.user, game=game, defaults={"score": score}
     )
 
-    return JsonResponse({
-        "status": "ok",
-        "score": score,
-        "average": game.ratings.aggregate(Avg("score"))["score__avg"]
-    })
+    return JsonResponse(
+        {
+            "status": "ok",
+            "score": score,
+            "average": game.ratings.aggregate(Avg("score"))["score__avg"],
+        }
+    )

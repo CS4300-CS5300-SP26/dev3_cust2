@@ -7,27 +7,49 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0006_merge_20260420_0412'),
+        ("home", "0006_merge_20260420_0412"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='game',
-            name='slug',
+            model_name="game",
+            name="slug",
             field=models.SlugField(blank=True, max_length=255, unique=True),
         ),
         migrations.CreateModel(
-            name='SimilarGame',
+            name="SimilarGame",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.FloatField()),
-                ('computed_at', models.DateTimeField(auto_now=True)),
-                ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='similar_games', to='home.game')),
-                ('similar', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='similar_to', to='home.game')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("score", models.FloatField()),
+                ("computed_at", models.DateTimeField(auto_now=True)),
+                (
+                    "game",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="similar_games",
+                        to="home.game",
+                    ),
+                ),
+                (
+                    "similar",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="similar_to",
+                        to="home.game",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-score'],
-                'unique_together': {('game', 'similar')},
+                "ordering": ["-score"],
+                "unique_together": {("game", "similar")},
             },
         ),
     ]

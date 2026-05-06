@@ -8,7 +8,9 @@ from home.models import Game
 from home.views import _ai_parse_query
 
 
-def make_ai_response(keywords=None, vibe_keywords=None, genre=None, free_only=False, max_price=None):
+def make_ai_response(
+    keywords=None, vibe_keywords=None, genre=None, free_only=False, max_price=None
+):
     """Helper that builds the dict _ai_parse_query returns."""
     return {
         "keywords": keywords or [],
@@ -23,6 +25,7 @@ def make_ai_response(keywords=None, vibe_keywords=None, genre=None, free_only=Fa
 # Unit tests for _ai_parse_query
 # ---------------------------------------------------------------------------
 
+
 class AiParseQueryTests(TestCase):
 
     def _mock_response(self, text):
@@ -34,7 +37,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_returns_parsed_json(self, mock_openai_cls):
         payload = '{"keywords": ["horror"], "vibe_keywords": ["dark"], "genre": "Horror", "free_only": false, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("scary horror game")
 
@@ -45,8 +50,10 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_strips_markdown_code_fences(self, mock_openai_cls):
-        payload = "```json\n{\"keywords\": [\"puzzle\"], \"vibe_keywords\": [], \"genre\": \"Puzzle\", \"free_only\": false, \"max_price\": null}\n```"
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        payload = '```json\n{"keywords": ["puzzle"], "vibe_keywords": [], "genre": "Puzzle", "free_only": false, "max_price": null}\n```'
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("puzzle game")
 
@@ -54,9 +61,12 @@ class AiParseQueryTests(TestCase):
         self.assertIn("puzzle", result["keywords"])
 
     @patch("home.views.OpenAI")
-    def test_strips_bare_code_fences_without_language_tag(self, mock_openai_cls):
-        payload = "```\n{\"keywords\": [\"rpg\"], \"vibe_keywords\": [], \"genre\": \"RPG\", \"free_only\": false, \"max_price\": null}\n```"
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+    def test_strips_bare_code_fences_without_language_tag(
+            self, mock_openai_cls):
+        payload = '```\n{"keywords": ["rpg"], "vibe_keywords": [], "genre": "RPG", "free_only": false, "max_price": null}\n```'
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("rpg game")
 
@@ -65,7 +75,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_free_only_flag(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": [], "genre": null, "free_only": true, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("free games")
 
@@ -74,7 +86,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_max_price_parsed(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": [], "genre": null, "free_only": false, "max_price": 5}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("games under $5")
 
@@ -84,7 +98,9 @@ class AiParseQueryTests(TestCase):
     @patch("home.views.OpenAI")
     def test_vibe_keywords_returned(self, mock_openai_cls):
         payload = '{"keywords": [], "vibe_keywords": ["relaxing", "peaceful", "cozy"], "genre": null, "free_only": false, "max_price": null}'
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response(payload)
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response(payload)
+        )
 
         result = _ai_parse_query("something relaxing")
 
@@ -93,14 +109,18 @@ class AiParseQueryTests(TestCase):
 
     @patch("home.views.OpenAI")
     def test_raises_on_invalid_json(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.return_value = self._mock_response("not valid json at all")
+        mock_openai_cls.return_value.responses.create.return_value = (
+            self._mock_response("not valid json at all")
+        )
 
         with self.assertRaises(Exception):
             _ai_parse_query("some query")
 
     @patch("home.views.OpenAI")
     def test_raises_on_api_error(self, mock_openai_cls):
-        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError("API unavailable")
+        mock_openai_cls.return_value.responses.create.side_effect = RuntimeError(
+            "API unavailable"
+        )
 
         with self.assertRaises(RuntimeError):
             _ai_parse_query("any query")
@@ -109,6 +129,7 @@ class AiParseQueryTests(TestCase):
 # ---------------------------------------------------------------------------
 # Integration tests for the browse view with AI search
 # ---------------------------------------------------------------------------
+
 
 class BrowseAiSearchTests(TestCase):
 
@@ -200,7 +221,9 @@ class BrowseAiSearchTests(TestCase):
         # keyword matches horror game; genre matches rpg — both should appear
         ai_result = make_ai_response(keywords=["terrifying"], genre="RPG")
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "terrifying rpg"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "terrifying rpg"})
 
         titles = [g.title for g in response.context["games"]]
         self.assertIn("Shadow Depths", titles)
@@ -223,7 +246,9 @@ class BrowseAiSearchTests(TestCase):
     def test_max_price_filter_excludes_expensive_games(self):
         ai_result = make_ai_response(max_price=5)
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "games under $5"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "games under $5"})
 
         games = list(response.context["games"])
         for game in games:
@@ -234,7 +259,8 @@ class BrowseAiSearchTests(TestCase):
         self.assertNotIn("Epic Quest", titles)
 
     def test_free_only_takes_precedence_over_max_price(self):
-        # When free_only is true, only $0 games returned regardless of max_price
+        # When free_only is true, only $0 games returned regardless of
+        # max_price
         ai_result = make_ai_response(free_only=True, max_price=10)
         with self._patch_ai(ai_result):
             response = self.client.get(self.browse_url, {"q": "free"})
@@ -246,7 +272,8 @@ class BrowseAiSearchTests(TestCase):
     # --- No filters / empty results ---
 
     def test_no_filters_returns_all_games(self):
-        # AI returns empty filters → all games returned (price filter already applied: none)
+        # AI returns empty filters → all games returned (price filter already
+        # applied: none)
         ai_result = make_ai_response()
         with self._patch_ai(ai_result):
             response = self.client.get(self.browse_url, {"q": "anything"})
@@ -256,7 +283,9 @@ class BrowseAiSearchTests(TestCase):
     def test_query_with_no_matching_games_returns_empty(self):
         ai_result = make_ai_response(keywords=["xyznonexistent"])
         with self._patch_ai(ai_result):
-            response = self.client.get(self.browse_url, {"q": "xyznonexistent"})
+            response = self.client.get(
+                self.browse_url, {
+                    "q": "xyznonexistent"})
 
         self.assertEqual(len(response.context["games"]), 0)
 

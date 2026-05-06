@@ -15,10 +15,15 @@ from .models import Game
 from django.conf import settings
 
 
-
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("title", "publisher", "developer", "storefront", "game_id", "price")
+    list_display = (
+        "title",
+        "publisher",
+        "developer",
+        "storefront",
+        "game_id",
+        "price")
     search_fields = ("title", "publisher", "developer", "game_id")
     change_list_template = "admin/home/game/change_list.html"
 
@@ -38,22 +43,26 @@ class GameAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-
     def sync_update_all_view(self, request):
         if request.method == "POST":
             start_id = request.POST.get("start_id", "").strip()
             end_id = request.POST.get("end_id", "").strip()
 
             if not start_id.isdigit() or not end_id.isdigit():
-                messages.error(request, "Start ID and End ID must both be numeric.")
-                return HttpResponseRedirect(reverse("admin:home_game_sync_update_all"))
+                messages.error(
+                    request, "Start ID and End ID must both be numeric.")
+                return HttpResponseRedirect(
+                    reverse("admin:home_game_sync_update_all"))
 
             start_id = int(start_id)
             end_id = int(end_id)
 
             if start_id > end_id:
-                messages.error(request, "Start ID must be less than or equal to End ID.")
-                return HttpResponseRedirect(reverse("admin:home_game_sync_update_all"))
+                messages.error(
+                    request, "Start ID must be less than or equal to End ID."
+                )
+                return HttpResponseRedirect(
+                    reverse("admin:home_game_sync_update_all"))
 
             created_count = 0
             updated_count = 0
@@ -62,7 +71,8 @@ class GameAdmin(admin.ModelAdmin):
             for steam_id in range(start_id, end_id + 1):
                 try:
                     steam_data = self.fetch_steam_game_data(str(steam_id))
-                    game, created = self.upsert_steam_game(str(steam_id), steam_data)
+                    game, created = self.upsert_steam_game(
+                        str(steam_id), steam_data)
 
                     if created:
                         created_count += 1
@@ -73,9 +83,11 @@ class GameAdmin(admin.ModelAdmin):
                     failed_ids.append(steam_id)
 
             if created_count:
-                messages.success(request, f"Created {created_count} Steam game(s).")
+                messages.success(
+                    request, f"Created {created_count} Steam game(s).")
             if updated_count:
-                messages.success(request, f"Updated {updated_count} Steam game(s).")
+                messages.success(
+                    request, f"Updated {updated_count} Steam game(s).")
             if failed_ids:
                 messages.warning(request, f"Failed IDs: {failed_ids}")
 
@@ -89,7 +101,8 @@ class GameAdmin(admin.ModelAdmin):
             "opts": self.model._meta,
             "title": "Update Steam games by range",
         }
-        return render(request, "admin/home/game/update_range_form.html", context)
+        return render(
+            request, "admin/home/game/update_range_form.html", context)
 
     def sync_update_one_view(self, request):
         if request.method == "POST":
@@ -97,7 +110,8 @@ class GameAdmin(admin.ModelAdmin):
 
             if not steam_id.isdigit():
                 messages.error(request, "Steam ID must be numeric.")
-                return HttpResponseRedirect(reverse("admin:home_game_sync_update_one"))
+                return HttpResponseRedirect(
+                    reverse("admin:home_game_sync_update_one"))
 
             try:
                 steam_data = self.fetch_steam_game_data(steam_id)
@@ -108,11 +122,13 @@ class GameAdmin(admin.ModelAdmin):
                 else:
                     messages.success(request, f"Updated {game.title}.")
 
-                return HttpResponseRedirect(reverse("admin:home_game_changelist"))
+                return HttpResponseRedirect(
+                    reverse("admin:home_game_changelist"))
 
             except Exception as e:
                 messages.error(request, f"Error: {e}")
-                return HttpResponseRedirect(reverse("admin:home_game_sync_update_one"))
+                return HttpResponseRedirect(
+                    reverse("admin:home_game_sync_update_one"))
 
         context = {
             **self.admin_site.each_context(request),
