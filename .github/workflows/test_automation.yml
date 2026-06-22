@@ -37,7 +37,7 @@ jobs:
     steps:
       # Runs checkout on the codebase
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       # Installs Python with latest architecture
       # Last updated March 17, 2026
