@@ -38,14 +38,14 @@ jobs:
     steps:
       # Pulls the latest data on the repository
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
       
       # Installs Python with latest architecture
       # Last updated March 16, 2026
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: 3.14.3
           architecture: x64

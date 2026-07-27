@@ -37,12 +37,12 @@ jobs:
     steps:
       # Runs checkout on the codebase
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       # Installs Python with latest architecture
       # Last updated March 17, 2026
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12.3
           architecture: x64
